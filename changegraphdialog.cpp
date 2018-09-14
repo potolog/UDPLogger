@@ -1,12 +1,12 @@
-#include "changegraph.h"
-#include "ui_changegraph.h"
+#include "changegraphdialog.h"
+#include "ui_changegraphdialog.h"
 #include "qcustomplot.h"
-#include "plots.h"
+#include "plot.h"
 #include "signals.h"
 
-changeGraph::changeGraph(Plot *parent_plot, QWidget* parent, Signals* signal) :
+changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals* signal) :
     QDialog(parent),
-    ui(new Ui::changeGraph), m_parent(parent_plot), m_signals(signal)
+    ui(new Ui::changeGraphDialog), m_parent(parent_plot), m_signals(signal)
 {
     ui->setupUi(this);
 
@@ -44,11 +44,7 @@ changeGraph::changeGraph(Plot *parent_plot, QWidget* parent, Signals* signal) :
     ui->combo_linestyle->addItem("QCPGraph::LineStyle::lsStepCenter",QCPGraph::LineStyle::lsStepCenter);
     ui->combo_linestyle->addItem("QCPGraph::LineStyle::lsImpulse",QCPGraph::LineStyle::lsImpulse);
 
-    struct Signal signal_temp;
-    for (int i=0; i< m_signals->getSignalCount(); i++){
-        signal_temp = m_signals->getSignal(i);
-        ui->combo_signalname->addItem(signal_temp.name,i);
-    }
+    updateSignals();
 
     if (ui->listWidget->count() <= 0){
         ui->combo_color->setEnabled(false);
@@ -60,16 +56,16 @@ changeGraph::changeGraph(Plot *parent_plot, QWidget* parent, Signals* signal) :
 
     m_previous_row = -1;
 
-    connect(ui->listWidget, &QListWidget::currentRowChanged, this, &changeGraph::listWidgetRowChanged);
-    connect(ui->txt_name, &QTextEdit::textChanged, this, &changeGraph::updateData2);
-    connect(ui->pb_cancel, &QPushButton::clicked, this, &changeGraph::cancel);
-    connect(ui->pb_apply, &QPushButton::clicked, this, &changeGraph::apply);
-    connect(ui->pb_ok, &QPushButton::clicked, this, &changeGraph::ok);
-    connect(ui->pb_delete, &QPushButton::clicked, this, &changeGraph::deleteElement);
-    connect(ui->pb_add, &QPushButton::clicked, this, qOverload<>(&changeGraph::addElement));
+    connect(ui->listWidget, &QListWidget::currentRowChanged, this, &changeGraphDialog::listWidgetRowChanged);
+    connect(ui->txt_name, &QTextEdit::textChanged, this, &changeGraphDialog::updateData2);
+    connect(ui->pb_cancel, &QPushButton::clicked, this, &changeGraphDialog::cancel);
+    connect(ui->pb_apply, &QPushButton::clicked, this, &changeGraphDialog::apply);
+    connect(ui->pb_ok, &QPushButton::clicked, this, &changeGraphDialog::ok);
+    connect(ui->pb_delete, &QPushButton::clicked, this, &changeGraphDialog::deleteElement);
+    connect(ui->pb_add, &QPushButton::clicked, this, qOverload<>(&changeGraphDialog::addElement));
 
 }
-void changeGraph::listWidgetRowChanged(int row){
+void changeGraphDialog::listWidgetRowChanged(int row){
 
     if(row <0){
         return;
@@ -113,7 +109,7 @@ void changeGraph::listWidgetRowChanged(int row){
     ui->txt_name->setText(m_settings_new[row].name);
 }
 
-void changeGraph::updateData(const QString &text){
+void changeGraphDialog::updateData(const QString &text){
 
     struct SettingsGraph settings;
 
@@ -128,7 +124,7 @@ void changeGraph::updateData(const QString &text){
 
 }
 
-void changeGraph::updateData2(){
+void changeGraphDialog::updateData2(){
     int row = ui->listWidget->currentRow();
 
     if (row >= 0){
@@ -139,7 +135,7 @@ void changeGraph::updateData2(){
 }
 
 // Save all settings if cancel was pressed
-void changeGraph::saveOldSettings(){
+void changeGraphDialog::saveOldSettings(){
 
     m_settings.clear();
 
@@ -156,7 +152,7 @@ void changeGraph::saveOldSettings(){
     }
 }
 
-void changeGraph::cancel(){
+void changeGraphDialog::cancel(){
     // restore old data
     for (int i=0; i<m_settings.length(); i++){
         m_parent->graph(i)->setLineStyle(static_cast<QCPGraph::LineStyle>(m_settings[i].linestyle));
@@ -174,7 +170,7 @@ void changeGraph::cancel(){
     close();
 }
 
-void changeGraph::apply(){
+void changeGraphDialog::apply(){
     // remove deleted graphs!!!
 
     int row = ui->listWidget->currentRow();
@@ -211,12 +207,12 @@ void changeGraph::apply(){
     }
 }
 
-void changeGraph::ok(){
+void changeGraphDialog::ok(){
     apply();
     close();
 }
 
-void changeGraph::deleteElement(){
+void changeGraphDialog::deleteElement(){
 
     int row = ui->listWidget->currentRow();
     QListWidgetItem* item = ui->listWidget->takeItem(row); // removes the element from the list and returns a pointer to the item to delete
@@ -229,11 +225,11 @@ void changeGraph::deleteElement(){
     m_parent->removeGraph(m_parent->graph(row));
 }
 
-void changeGraph::addElement(){
+void changeGraphDialog::addElement(){
     addElement(nullptr);
 }
 
-void changeGraph::addElement(struct SettingsGraph* settings_import=nullptr){
+void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr){
     struct SettingsGraph settings;
     QString name = "";
 
@@ -293,7 +289,15 @@ void changeGraph::addElement(struct SettingsGraph* settings_import=nullptr){
     ui->combo_signalname->setEnabled(true);
 }
 
-changeGraph::~changeGraph()
+void changeGraphDialog::updateSignals(){
+    struct Signal signal_temp;
+    for (int i=0; i< m_signals->getSignalCount(); i++){
+        signal_temp = m_signals->getSignal(i);
+        ui->combo_signalname->addItem(signal_temp.name,i);
+    }
+}
+
+changeGraphDialog::~changeGraphDialog()
 {
     delete ui;
 }

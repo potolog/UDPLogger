@@ -24,11 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
     m_vlayout->addWidget(m_plots);
     ui->centralWidget->setLayout(m_vlayout);
 
-    QAction *addPlot = new QAction(tr("&Add Plot"), this);
-    addPlot->setStatusTip(tr("Wizard to create a new Plot"));
-    connect(addPlot, &QAction::triggered, m_plots, &Plots::createNewPlot);
-    ui->menuBar->addAction(addPlot);
-
     QMenu* menu = ui->menuBar->addMenu(tr("&File"));
 
     QAction *export_settings = new QAction(tr("&export Settings"), this);
@@ -40,6 +35,16 @@ MainWindow::MainWindow(QWidget *parent) :
     import_settings->setStatusTip(tr("Wizard to create a new Plot"));
     connect(import_settings, &QAction::triggered, m_plots, &Plots::importSettings);
     menu->addAction(import_settings);
+
+    QAction *import_signals = new QAction(tr("&import Signals"), this);
+    import_signals->setStatusTip(tr("Import new Signals from file"));
+    connect(import_signals, &QAction::triggered, m_signal, &Signals::importSignals);
+    menu->addAction(import_signals);
+
+    QAction *addPlot = new QAction(tr("&Add Plot"), this);
+    addPlot->setStatusTip(tr("Wizard to create a new Plot"));
+    connect(addPlot, &QAction::triggered, m_plots, &Plots::createNewPlot);
+    ui->menuBar->addAction(addPlot);
 
     QAction *start_udp = new QAction(tr("Start UDP"), this);
     start_udp->setStatusTip(tr("Starts reading from UDP Buffer"));
@@ -54,8 +59,6 @@ MainWindow::MainWindow(QWidget *parent) :
     QAction *settings_widget = new QAction(tr("Settings"), this);
     connect(settings_widget, &QAction::triggered, m_plots, &Plots::settings);
     ui->menuBar->addAction(settings_widget);
-
-
 }
 
 MainWindow::~MainWindow()

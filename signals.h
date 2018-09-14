@@ -2,6 +2,7 @@
 #define SIGNALS_H
 #include <QString>
 #include <QVector>
+#include <QObject>
 
 struct Signal{
     QString name;
@@ -11,13 +12,20 @@ struct Signal{
 };
 
 // eventuell erweitern, dass signalnamen von datei eingelesen werden können.
-class Signals
+class Signals: public QObject
 {
+    Q_OBJECT
 public:
     Signals();
     int getSignalCount(){return m_signals.length();}
     struct Signal getSignal(int index){return m_signals[index];}
     void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals;}
+
+public slots:
+    void importSignals();
+
+signals:
+    void signalsChanged();
 
 private:
    QVector<struct Signal> m_signals;

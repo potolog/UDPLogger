@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QVector>
 
+class QFile;
 class QUdpSocket;
 class QMutex;
 class Plots;
@@ -16,7 +17,7 @@ class UDP: public QObject
 
 public:
     UDP(Plots* parent, QMutex* mutex);
-    bool init(QHostAddress hostaddress, quint16 port, int buffer_size);
+    bool init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename);
     bool init();
     ~UDP();
 public slots:
@@ -35,11 +36,17 @@ private:
     int m_actual_index;
     QUdpSocket *m_socket;
     QVector<char> m_data;
+    QVector<char> m_data_temp;
     const int m_max_data = 400;
+
+    bool m_export_data;
+    QFile* file;
+    bool m_if_file_ready;
 
     QMutex* m_mutex;
     unsigned long m_index_read; // index which data was read
     Plots* m_parent;
+
 
 
 };

@@ -1,5 +1,5 @@
-#ifndef CHANGEGRAPH_H
-#define CHANGEGRAPH_H
+#ifndef CHANGEGRAPHDIALOG_H
+#define CHANGEGRAPHDIALOG_H
 
 #include <QDialog>
 #include "signals.h"
@@ -16,19 +16,20 @@ struct SettingsGraph{
 };
 
 namespace Ui {
-class changeGraph;
+class changeGraphDialog;
 }
 
-class changeGraph : public QDialog
+class changeGraphDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit changeGraph(Plot* parent_plot, QWidget* parent, Signals *signal);
+    explicit changeGraphDialog(Plot* parent_plot, QWidget* parent, Signals *signal);
     void saveOldSettings();
     struct SettingsGraph getSettings(int index){return m_settings[index];}
+    void updateSignals();
 
-    ~changeGraph();
+    ~changeGraphDialog();
 public slots:
     void addElement(struct SettingsGraph* settings_import);
 private slots:
@@ -41,7 +42,7 @@ private slots:
     void updateData2();
     void listWidgetRowChanged(int row);
 private:
-    Ui::changeGraph *ui;
+    Ui::changeGraphDialog *ui;
     Plot* m_parent;
     QVector<struct SettingsGraph> m_settings; // old settings
     QVector<struct SettingsGraph> m_settings_new;
@@ -51,4 +52,4 @@ private:
 
 };
 
-#endif // CHANGEGRAPH_H
+#endif // CHANGEGRAPHDIALOG_H

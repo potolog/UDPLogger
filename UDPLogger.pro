@@ -32,24 +32,26 @@ SOURCES += \
     qcustomplot.cpp \
     plots.cpp \
     plotscontextmenu.cpp \
-    changegraph.cpp \
+    changegraphdialog.cpp \
     udp.cpp \
     signals.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    plot.cpp
 
 HEADERS += \
         mainwindow.h \
     qcustomplot.h \
     plots.h \
     plotscontextmenu.h \
-    changegraph.h \
+    changegraphdialog.h \
     udp.h \
     signals.h \
-    settingsdialog.h
+    settingsdialog.h \
+    plot.h
 
 FORMS += \
         mainwindow.ui \
-    changegraph.ui \
+    changegraphdialog.ui \
     settingsdialog.ui
 
 # Default rules for deployment.
