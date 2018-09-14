@@ -57,6 +57,16 @@ FORMS += \
     forms/settingsdialog.ui
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+#flatpak=true
+isEmpty(flatpak){
+    flatpak = false
+}
+
+equals(flatpak, true){
+    target.path =/app/bin
+    message("Target path: " $$target.path)
+
+}else: unix:!android: target.path = /opt/$${TARGET}/bin
+
+
+INSTALLS += target
