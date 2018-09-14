@@ -7,7 +7,7 @@
 QT       += core gui widgets printsupport
 QT += network
 
-TARGET = UDPLogger
+TARGET = "com.github.UDPLogger.UDPLogger"
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
