@@ -1,0 +1,30 @@
+{
+  "app-id": "com.github.UDPLogger.UDPLogger",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "5.11",
+  "sdk": "org.kde.Sdk",
+  "command": "com.github.UDPLogger.UDPLogger",
+  "finish-args": [
+    "--socket=wayland",
+	"--socket=x11",
+    "--filesystem=xdg-run/dconf", "--filesystem=~/.config/dconf:ro",
+    "--filesystem=home"],
+    "modules": [
+      {
+        "name": "udpLogger",
+        "buildsystem": "qmake",
+		"config-opts": ["flatpak=true"],
+		"build-commands": [
+			"desktop-file-install --dir=/app/share/metainfo res/linux/com.github.UDPLogger.UDPLogger.desktop",
+			"install -Dm755 res/linux/com.github.UDPLogger.UDPLogger.appdata.xml /app/share/metainfo/com.github.UDPLogger.UDPLogger.appdata.xml"
+			
+		],
+        "sources": [
+          {
+            "type": "git",
+            "url": "https://github.com/Murmele/UDPLogger.git"
+          }
+        ]
+      }
+    ]
+}
