@@ -1,0 +1,14 @@
+[Desktop Entry]
+Name=UDPLogger
+Name[de_AT]=com.github.UDPLogger.UDPLogger
+GenericName=c
+GenericName[de]=UDPLogger
+Comment=Logging and plotting UDP Data
+Comment[de]=Loggen und plotten von UDP Paketen
+Exec=UDPLogger %U
+Icon=com.github.UDPLogger.UDPLogger.png
+Terminal=false
+Type=Application
+Categories=Electronics;
+StartupNotify=false
+
