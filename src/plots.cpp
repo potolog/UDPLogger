@@ -169,7 +169,7 @@ void Plots::importSettings(){
 
     if(m_ifudpLogging){
         QMessageBox msgBox;
-        msgBox.setText("Please Stop UDP Logging");
+        msgBox.setText(tr("Please Stop UDP Logging"));
         msgBox.exec();
 
         return;
