@@ -24,35 +24,37 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11 \
         c++14
         debug
-
+INCLUDEPATH += \
+    src \
+    includes
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    qcustomplot.cpp \
-    plots.cpp \
-    plotscontextmenu.cpp \
-    changegraphdialog.cpp \
-    udp.cpp \
-    signals.cpp \
-    settingsdialog.cpp \
-    plot.cpp
+    src/udp.cpp \
+    src/changegraphdialog.cpp \
+    src/main.cpp \
+    src/mainwindow.cpp \
+    src/plot.cpp \
+    src/plots.cpp \
+    src/plotscontextmenu.cpp \
+    src/qcustomplot.cpp \
+    src/settingsdialog.cpp \
+    src/signals.cpp
 
 HEADERS += \
-        mainwindow.h \
-    qcustomplot.h \
-    plots.h \
-    plotscontextmenu.h \
-    changegraphdialog.h \
-    udp.h \
-    signals.h \
-    settingsdialog.h \
-    plot.h
+    includes/changegraphdialog.h \
+    includes/mainwindow.h \
+    includes/plot.h \
+    includes/plots.h \
+    includes/plotscontextmenu.h \
+    includes/qcustomplot.h \
+    includes/settingsdialog.h \
+    includes/signals.h \
+    includes/udp.h
 
 FORMS += \
-        mainwindow.ui \
-    changegraphdialog.ui \
-    settingsdialog.ui
+    forms/changegraphdialog.ui \
+    forms/mainwindow.ui \
+    forms/settingsdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

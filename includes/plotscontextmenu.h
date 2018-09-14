@@ -17,9 +17,20 @@
  *  along with UDPLogger.  If not, see <http://www.gnu.org/licenses/>.
  ***/
 
-#include "plotscontextmenu.h"
+#ifndef PLOTSCONTEXTMENU_H
+#define PLOTSCONTEXTMENU_H
 
-PlotsContextMenu::PlotsContextMenu(QWidget *parent) : QWidget(parent)
+#include <QWidget>
+
+class PlotsContextMenu : public QWidget
 {
+    Q_OBJECT
+public:
+    explicit PlotsContextMenu(QWidget *parent = nullptr);
 
-}
+signals:
+
+public slots:
+};
+
+#endif // PLOTSCONTEXTMENU_H

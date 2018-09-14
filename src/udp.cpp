@@ -1,3 +1,22 @@
+/***
+ *  This file is part of UDPLogger
+ *
+ *  Copyright (C) 2018 Martin Marmsoler, martin.marmsoler at gmail.com
+ *
+ *  UDPLogger is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with UDPLogger.  If not, see <http://www.gnu.org/licenses/>.
+ ***/
+
 #include "udp.h"
 #include <QUdpSocket>
 #include <iostream>
@@ -13,12 +32,10 @@ UDP::UDP(Plots *parent, QMutex *mutex): m_mutex(mutex), m_parent(parent)
     connect(this, &UDP::newData, m_parent, &Plots::newData);
 }
 bool UDP::init(){
-    return init(QHostAddress::Any, 60000, 400, false, "");
+    return init(QHostAddress::AnyIPv4, 60000, 400, false, "");
 }
 
 bool UDP::init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename = ""){
-    m_socket->close();
-    m_socket = new QUdpSocket(this);
 
     m_data.resize(buffer_size);
     m_data_temp.resize(buffer_size);
