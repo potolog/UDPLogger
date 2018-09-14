@@ -275,6 +275,12 @@ void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr
         settings.scatterstyle = ui->combo_scatter_style->itemData(0).toInt();
         settings.color = QColor(static_cast<Qt::GlobalColor>(ui->combo_color->itemData(0).toInt()));
         settings.name = name;
+        if(m_signals->getSignalCount() == 0){
+            QMessageBox msgBox;
+            msgBox.setText(tr("No signals available"));
+            msgBox.exec();
+            return;
+        }
         settings.signal = m_signals->getSignal(ui->combo_signalname->itemData(0).toInt());
     }else{
         settings.linestyle = settings_import->linestyle;
