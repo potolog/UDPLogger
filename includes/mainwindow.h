@@ -41,6 +41,9 @@ public:
     void addPlot();
     void clearData();
     void plot();
+ public slots:
+    void disableStartUDP();
+    void disableStopUDP();
 
 
 private:
@@ -50,6 +53,8 @@ private:
     Plots *m_plots;
     QVector<double> qv_x, qv_y;
     Signals* m_signal;
+    QAction* m_start_udp;
+    QAction* m_stop_udp;
 
 
 

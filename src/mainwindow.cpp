@@ -65,19 +65,33 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(addPlot, &QAction::triggered, m_plots, &Plots::createNewPlot);
     ui->menuBar->addAction(addPlot);
 
-    QAction *start_udp = new QAction(tr("Start UDP"), this);
-    start_udp->setStatusTip(tr("Starts reading from UDP Buffer"));
-    connect(start_udp, &QAction::triggered, m_plots, &Plots::startUDP);
-    ui->menuBar->addAction(start_udp);
+    m_start_udp = new QAction(tr("Start UDP"), this);
+    m_start_udp->setStatusTip(tr("Starts reading from UDP Buffer"));
+    connect(m_start_udp, &QAction::triggered, m_plots, &Plots::startUDP);
+    connect(m_start_udp, &QAction::triggered, this, &MainWindow::disableStartUDP);
+    ui->menuBar->addAction(m_start_udp);
 
-    QAction *stop_udp = new QAction(tr("Stop UDP"), this);
-    stop_udp->setStatusTip(tr("Stops reading from UDP Buffer"));
-    connect(stop_udp, &QAction::triggered, m_plots, &Plots::stopUDP);
-    ui->menuBar->addAction(stop_udp);
+    m_stop_udp = new QAction(tr("Stop UDP"), this);
+    m_stop_udp->setStatusTip(tr("Stops reading from UDP Buffer"));
+    connect(m_stop_udp, &QAction::triggered, m_plots, &Plots::stopUDP);
+    connect(m_stop_udp, &QAction::triggered, this, &MainWindow::disableStopUDP);
+    ui->menuBar->addAction(m_stop_udp);
 
     QAction *settings_widget = new QAction(tr("Settings"), this);
     connect(settings_widget, &QAction::triggered, m_plots, &Plots::settings);
     ui->menuBar->addAction(settings_widget);
+
+    disableStopUDP();
+}
+
+void MainWindow::disableStartUDP(){
+    m_start_udp->setEnabled(false);
+    m_stop_udp->setEnabled(true);
+}
+
+void MainWindow::disableStopUDP(){
+    m_start_udp->setEnabled(true);
+    m_stop_udp->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
