@@ -153,10 +153,10 @@ void Plot::newData(unsigned long index){
             m_y_data[i].removeFirst();
         }
 
-        if(i==0){
+        if(i==0){ // init limits
             m_ymax = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
             m_ymin = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-        }else{
+        }else{ // adjust limits
 
             double min = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
             double max = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
@@ -178,14 +178,18 @@ void Plot::newData(unsigned long index){
     double max_factor;
     if(m_ymin <0){
         min_factor = (m_ymin -5)/m_ymin;
-    }else{
+    }else if(m_ymin >0){
         min_factor = (m_ymin -5)/m_ymin;
+    }else {
+        min_factor = -5;
     }
 
     if(m_ymax > 0){
         max_factor = (m_ymax+5)/m_ymax;
-    }else{
+    }else if(m_ymax <0){
         max_factor = (m_ymax +5)/m_ymax;
+    }else{
+        max_factor = 5;
     }
 
     yAxis->setRange(m_ymin*min_factor, m_ymax*max_factor);
