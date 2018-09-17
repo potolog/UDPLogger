@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>com.github.UDPLogger.UDPLogger</id>
+  <id>com.github.Murmele.UDPLogger</id>
   <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-3.0</project_license>
   <name>UDPLogger</name>
@@ -11,10 +11,11 @@
     <ul>
       <li>Saving UDP data in a file</li>
 	  <li>Plotting UDP data in realtime</li>
+	  <li>Importing signal names from *.xlsx</li>
     </ul>
   </description>
 
-  <launchable type="desktop-id">com.github.UDPLogger.UDPLogger</launchable>
+  <launchable type="desktop-id">com.github.Murmele.UDPLogger</launchable>
 
   <screenshots>
     <screenshot type="default">
@@ -27,7 +28,7 @@
 
   <provides>
     <binary>UDPLogger</binary>
-    <id>com.github.UDPLogger.UDPLogger</id>
+    <id>com.github.Murmele.UDPLogger.UDPLogger</id>
   </provides>
 
   <releases>

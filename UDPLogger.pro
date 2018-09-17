@@ -7,7 +7,7 @@
 QT       += core gui widgets printsupport
 QT += network
 
-TARGET = "com.github.UDPLogger.UDPLogger"
+TARGET = "com.github.Murmele.UDPLogger"
 TEMPLATE = app
 
 isEmpty(flatpak){
