@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=UDPLogger
-Name[de_AT]=com.github.UDPLogger.UDPLogger
+Name[de_AT]=UDPLogger.desktop
 GenericName=c
 GenericName[de]=UDPLogger
 Comment=Logging and plotting UDP Data
