@@ -109,8 +109,9 @@ void Plots::deletePlot(int index){
     if(item->widget() == m_plots.at(index)){
         returnvalue = disconnect(this, &Plots::newData2, m_plots.at(index), &Plot::newData);
         returnvalue = disconnect(m_signals, &Signals::signalsChanged, m_plots.at(index), &Plot::signalsChanged);
+        disconnect(this, &Plots::resizePlotBuffer, m_plots.at(index), &Plot::resizePlotBuffer);
         qDebug() << "Deleting Object";
-        delete item->widget();
+        item->widget()->deleteLater();
         m_plots.remove(index);
     }
 }
