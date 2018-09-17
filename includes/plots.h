@@ -73,10 +73,10 @@ private:
     int m_udp_buffersize;
     int m_plot_buffersize;
     bool m_export_data;
+    QString m_export_filename;
 
     QString m_program_version;
     QString m_project_name;
-    QString m_fileName;
     bool m_ifudpLogging;
     SettingsDialog* m_settings_dialog;
 

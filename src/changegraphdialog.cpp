@@ -315,6 +315,7 @@ void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr
 }
 
 void changeGraphDialog::updateSignals(){
+    ui->combo_signalname->clear();
     struct Signal signal_temp;
     for (int i=0; i< m_signals->getSignalCount(); i++){
         signal_temp = m_signals->getSignal(i);

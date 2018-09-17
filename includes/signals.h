@@ -39,6 +39,8 @@ public:
     int getSignalCount(){return m_signals.length();}
     struct Signal getSignal(int index){return m_signals[index];}
     void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals;}
+    void importJSonFile(QString filename);
+    int importXLSX(QString filename);
 
 public slots:
     void importSignals();
