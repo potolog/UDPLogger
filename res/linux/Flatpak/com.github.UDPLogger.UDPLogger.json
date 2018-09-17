@@ -1,30 +1,38 @@
 {
-  "app-id": "com.github.UDPLogger.UDPLogger",
+  "app-id": "com.github.Murmele.UDPLogger",
   "runtime": "org.kde.Platform",
   "runtime-version": "5.11",
   "sdk": "org.kde.Sdk",
-  "command": "com.github.UDPLogger.UDPLogger",
+  "command": "com.github.Murmele.UDPLogger",
+  "rename-desktop-file": "UDPLogger.desktop",
+  "rename-appdata-file": "UDPLogger.appdata.xml",
+  "rename-icon": "UDPLogger",
   "finish-args": [
     "--socket=wayland",
 	"--socket=x11",
-    "--filesystem=xdg-run/dconf", "--filesystem=~/.config/dconf:ro",
-    "--filesystem=home"],
+    "--filesystem=home",
+	"--share=network"],	
     "modules": [
-      {
-        "name": "udpLogger",
-        "buildsystem": "qmake",
+		"modules/xlnt.json",	
+		{
+		"name": "udpLogger",
+		"buildsystem": "qmake",
 		"config-opts": ["flatpak=true"],
 		"build-commands": [
-			"desktop-file-install --dir=/app/share/metainfo res/linux/com.github.UDPLogger.UDPLogger.desktop",
-			"install -Dm755 res/linux/com.github.UDPLogger.UDPLogger.appdata.xml /app/share/metainfo/com.github.UDPLogger.UDPLogger.appdata.xml"
-			
+			"desktop-file-install --dir=/app/share/applications res/linux/UDPLogger.desktop",
+			"install -Dm755 res/linux/UDPLogger.appdata.xml /app/share/metainfo/UDPLogger.appdata.xml",
+			"install -Dm755 res/icons/scalable/apps/UDPLogger.svg /app/share/icons/hicolor/scalable/apps/UDPLogger.svg",
+			"install -Dm755 res/icons/16x16/apps/UDPLogger.png /app/share/icons/hicolor/16x16/apps/UDPLogger.png",
+			"install -Dm755 res/icons/32x32/apps/UDPLogger.png /app/share/icons/hicolor/32x32/apps/UDPLogger.png",
+			"install -Dm755 res/icons/64x64/apps/UDPLogger.png /app/share/icons/hicolor/64x64/apps/UDPLogger.png",
+			"install -Dm755 res/icons/256x256/apps/UDPLogger.png /app/share/icons/hicolor/256x256/apps/UDPLogger.png"			
 		],
-        "sources": [
-          {
-            "type": "git",
-            "url": "https://github.com/Murmele/UDPLogger.git"
-          }
-        ]
-      }
+		"sources": [
+		  {
+			"type": "git",
+			"url": "https://github.com/Murmele/UDPLogger.git"
+		  }
+		]
+		}
     ]
 }
