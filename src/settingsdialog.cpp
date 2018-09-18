@@ -31,7 +31,9 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->spinbox_udp_buffer->setRange(1,2147483647);
     ui->spinbox_data_buffersize->setRange(1,2147483647);
     ui->spinbox_port->setRange(0,65535);
+    ui->spinbox_redraw_count->setRange(1,2147483647);
     ui->txt_hostaddress->setInputMask("000.000.000.000;_");
+    ui->spinbox_use_element_count->setRange(1,2147483647);
 
     ui->combo_hostname->addItem("address",QHostAddress::Null);
     ui->combo_hostname->addItem("AnyIPv4",QHostAddress::AnyIPv4);
@@ -72,19 +74,23 @@ void SettingsDialog::comboHostnameIndexChanged(int index){
 void SettingsDialog::accepted(){
 
     int udp_buffersize, plot_buffersize, data_buffersize, port;
+    int redraw_count;
     bool export_data;
+    int use_data_count;
 
     udp_buffersize = static_cast<int>(ui->spinbox_udp_buffer->value());
     plot_buffersize = static_cast<int>(ui->spinbox_plot_buffer->value());
     data_buffersize = static_cast<int>(ui->spinbox_data_buffersize->value());
+    redraw_count = static_cast<int>(ui->spinbox_redraw_count->value());
     port = static_cast<int>(ui->spinbox_port->value());
     export_data = ui->checkbox_export_data->isChecked();
+    use_data_count = static_cast<int>(ui->spinbox_use_element_count->value());
 
     QHostAddress hostname(ui->txt_hostaddress->text());
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, export_filename);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, redraw_count, use_data_count, export_filename);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -119,18 +125,23 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["DataPufferSize"] = static_cast<int>(ui->spinbox_data_buffersize->value());
     object["ExportData"] = ui->checkbox_export_data->isChecked();
     object["ExportDataFile"] =ui->txt_export_path->text();
+    object["RedrawCount"] = static_cast<int>(ui->spinbox_redraw_count->value());
+    object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
 }
 
 void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
 
     ui->spinbox_plot_buffer->setValue(static_cast<double>(object["PlotPufferSize"].toInt()));
     ui->spinbox_data_buffersize->setValue(static_cast<double>(object["DataPufferSize"].toInt()));
-    ui->checkbox_export_data->setChecked(object["ExportData"].toBool())
-            ;
+    ui->checkbox_export_data->setChecked(object["ExportData"].toBool());
+    ui->spinbox_redraw_count->setValue(static_cast<double>(object["RedrawCount"].toInt()));
+    ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
+
     QJsonObject network_settings = object["NetworkSettings"].toObject();
     ui->txt_hostaddress->setText(QHostAddress(network_settings["HostAddress"].toString()).toString());
     ui->spinbox_port->setValue(static_cast<double>(network_settings["Port"].toInt()));
     ui->spinbox_udp_buffer->setValue(static_cast<double>(network_settings["UDPPufferSize"].toInt()));
+
 
     ui->txt_project_name->setText(project_name);
     ui->txt_export_path->setText(object["ExportDataFile"].toString());

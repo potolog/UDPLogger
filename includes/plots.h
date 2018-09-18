@@ -45,6 +45,9 @@ public:
     unsigned long getbufferIndex(){return m_index_buffer;}
     int getBufferCount(){return m_udp_buffersize;}
     void changeDataBufferSize(int data_buffersize, int udp_buffersize);
+    int getRedrawCounter(){return m_redraw_count;}
+    int getDataBufferSize(){return m_data_buffersize;}
+    int getSkipElement(){return m_use_data_count;}
     ~Plots();
 public slots:
     void deletePlot(int index);
@@ -54,14 +57,14 @@ public slots:
     void settings();
     void startUDP();
     void stopUDP();
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename);
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename);
 signals:
     void startUDPReadData();
     void newData2(unsigned long m_index_buffer);
     void resizePlotBuffer(int udp_buffersize, int plot_buffersize);
     void connectToReadyRead();
     void disconnectToReadyRead();
-    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename);
+    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data,int m_use_data_count, QString filename);
 private:
     QWidget* m_parent;
     QVector<Plot*> m_plots;
@@ -76,6 +79,9 @@ private:
     int m_plot_buffersize;
     bool m_export_data;
     QString m_export_filename;
+    int m_redraw_count;
+    unsigned long m_index_new_data; // used with m_redraw_count
+    int m_use_data_count;
 
     QString m_program_version;
     QString m_project_name;

@@ -36,7 +36,7 @@ class UDP: public QObject
 
 public:
     UDP(Plots* parent, QMutex* mutex);
-    bool init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename);
+    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, bool export_data, int use_data_count, QString filename);
     bool init();
     ~UDP();
 public slots:
@@ -57,6 +57,7 @@ private:
     QVector<char> m_data;
     QVector<char> m_data_temp;
     const int m_max_data = 400;
+    int m_use_data_count;
 
     bool m_export_data;
     QFile* file;

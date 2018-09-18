@@ -34,18 +34,15 @@ UDP::UDP(Plots *parent, QMutex *mutex): m_mutex(mutex), m_parent(parent)
     m_ifread_data = 0;
 }
 bool UDP::init(){
-    return init(QHostAddress::AnyIPv4, 60000, 400, false, "");
+    return init(QHostAddress::AnyIPv4, 60000, 400, false,1, "");
 }
 
-bool UDP::init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename){
-
-    //m_socket->~QUdpSocket();
-    //m_socket = new QUdpSocket(this);
+bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, bool export_data, int use_data_count, QString filename){
 
     m_socket->disconnectFromHost();
-
-    m_data.resize(buffer_size);
-    m_data_temp.resize(buffer_size);
+    m_use_data_count = use_data_count;
+    m_data.resize(udp_buffer_size);
+    m_data_temp.resize(udp_buffer_size);
     m_if_file_ready = 0;
 
     m_actual_index = 0;
@@ -76,7 +73,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int buffer_size, bool exp
 
 void UDP::readData(){
 
-    if(m_actual_index >= m_data.size()){
+    if(m_actual_index >= m_use_data_count){
         m_actual_index = 0;
     }
 
@@ -85,7 +82,7 @@ void UDP::readData(){
     m_mutex->lock();
     m_data = m_data_temp;
     m_mutex->unlock();
-    if(m_ifread_data){
+    if(m_ifread_data && m_actual_index==0){ // only every m_m_use_data_count data should be plottet
         emit newData();
     }
 

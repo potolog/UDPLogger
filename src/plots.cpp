@@ -33,7 +33,9 @@ Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(sign
     m_project_name = "Project1";
     m_layout = new QVBoxLayout(parent);
     m_index_buffer = 0;
+    m_index_new_data = 0;
     m_ifudpLogging = false;
+    m_use_data_count = 0;
 
     int port = 60000;
     int udp_buffersize = 400;
@@ -59,7 +61,7 @@ Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(sign
     connect(this, &Plots::connectToReadyRead, m_udp, &UDP::connectDataReady, Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
     qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
-    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int, bool, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
+    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int, bool,int, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
 
     m_settings_dialog = new SettingsDialog(this);
     m_settings_dialog->setSettings(m_project_name, m_hostaddress, m_udp_buffersize, m_plot_buffersize,m_data_buffersize, m_port, m_export_data,"");
@@ -96,7 +98,19 @@ void Plots::newData(){
         m_data_buffer[m_index_buffer][i] = value;
     }
     m_mutex->unlock();
-    emit newData2(m_index_buffer);
+
+    unsigned long difference;
+    if(m_index_buffer < m_index_new_data){
+        difference = m_data_buffersize -m_index_new_data+m_index_buffer;
+    }else{
+        difference = m_index_buffer - m_index_new_data;
+    }
+
+
+    if(difference >= static_cast<unsigned long>(m_redraw_count)-1){
+        m_index_new_data = m_index_buffer;
+        emit newData2(m_index_buffer);
+    }
 
     m_index_buffer++;
 
@@ -300,7 +314,7 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename){
     m_project_name = project_name;
     m_hostaddress = hostname;
     m_plot_buffersize = plot_buffersize;
@@ -308,8 +322,10 @@ void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int ud
     m_data_buffersize = data_buffersize;
     m_port = port;
     m_export_data = export_data;
+    m_redraw_count = redraw_count;
+    m_use_data_count = use_data_count;
     changeDataBufferSize(data_buffersize, udp_buffersize);
-    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize, export_data, export_filename);
+    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize, export_data,use_data_count, export_filename);
 
     emit resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
 }

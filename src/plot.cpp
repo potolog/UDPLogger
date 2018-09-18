@@ -121,53 +121,66 @@ void Plot::resizePlotBuffer(int udp_buffersize, int plot_buffersize){
 void Plot::newData(unsigned long index){
 // process new data
 
+    for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
 
-    if(m_signal_settings.count()>0){
-        // first double is x Axis
-        double x_val = m_parent->getBufferData(index,0);
-        m_x_data.append(x_val);
-        if(x_val > m_xmax){
-            m_xmax = x_val;
+        if (j<0){
+            j= m_parent->getDataBufferSize()-j;
         }
 
-        int size = m_x_data.size()- m_plot_buffersize;
-        for (int i= 0; i<size; i++){
-            m_x_data.removeFirst();
+        if(m_signal_settings.count()>0){
+            // first double is x Axis
+            double x_val = m_parent->getBufferData(j,0);
+            m_x_data.append(x_val);
+            if(x_val > m_xmax){
+                m_xmax = x_val;
+            }
+
+            int size = m_x_data.size()- m_plot_buffersize;
+            for (int i= 0; i<size; i++){
+                m_x_data.removeFirst();
+            }
+            m_xmin = m_x_data[0];
+            m_xmax = m_x_data[m_x_data.size()-1];
         }
-        m_xmin = m_x_data[0];
-        m_xmax = m_x_data[m_x_data.size()-1];
     }
+
+
 
     struct Signal signal;
     for(unsigned int i=0; i<graphCount(); i++){
         signal = m_signal_settings.at(i);
 
+        for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
 
-
-        //int index_temp = (index*m_parent->getBufferCount()+signal.index);
-        double y_val = m_parent->getBufferData(index, signal.index);
-        m_y_data[i].append(y_val);
-
-        int size=m_y_data[i].size()-m_plot_buffersize;
-        for(int j=0; j<size; j++){
-            m_y_data[i].removeFirst();
-        }
-
-        if(i==0){ // init limits
-            m_ymax = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-            m_ymin = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-        }else{ // adjust limits
-
-            double min = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-            double max = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-
-            if(max > m_ymax){
-                m_ymax = max;
-            }
-            if(min < m_ymin){
-                m_ymin = min;
+            if (j<0){
+                j= m_parent->getDataBufferSize()-j;
             }
 
+            //int index_temp = (index*m_parent->getBufferCount()+signal.index);
+            double y_val = m_parent->getBufferData(j, signal.index);
+            m_y_data[i].append(y_val);
+
+            int size=m_y_data[i].size()-m_plot_buffersize;
+            for(int j=0; j<size; j++){
+                m_y_data[i].removeFirst();
+            }
+
+            if(i==0){ // init limits
+                m_ymax = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
+                m_ymin = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
+            }else{ // adjust limits
+
+                double min = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
+                double max = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
+
+                if(max > m_ymax){
+                    m_ymax = max;
+                }
+                if(min < m_ymin){
+                    m_ymin = min;
+                }
+
+            }
         }
 
         graph(i)->setData(m_x_data,m_y_data[i]);

@@ -48,7 +48,7 @@ private slots:
     void on_btn_browse_export_file_clicked();
 
 signals:
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename);
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int skip_element,QString export_filename);
 
 private:
     Ui::SettingsDialog *ui;
