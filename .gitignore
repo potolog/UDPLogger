@@ -2,3 +2,5 @@ build
 
 *.user
 *.flatpak-builder
+UDPLogger
+meinRepoUDPLogger
