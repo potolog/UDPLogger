@@ -66,6 +66,8 @@ private:
     unsigned long m_index_read; // index which data was read
     Plots* m_parent;
 
+    bool m_ifread_data;
+
 
 
 };

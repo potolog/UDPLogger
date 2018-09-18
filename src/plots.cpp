@@ -54,8 +54,12 @@ Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(sign
 
     m_udp->moveToThread(&m_udp_thread);
     m_udp_thread.start();
-    m_ifudpLogging = 1;
-    m_udp->connectDataReady();
+    //m_ifudpLogging = 1;
+    //m_udp->connectDataReady();
+    connect(this, &Plots::connectToReadyRead, m_udp, &UDP::connectDataReady, Qt::ConnectionType::QueuedConnection);
+    connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
+    qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
+    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int, bool, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
 
     m_settings_dialog = new SettingsDialog(this);
     m_settings_dialog->setSettings(m_project_name, m_hostaddress, m_udp_buffersize, m_plot_buffersize,m_data_buffersize, m_port, m_export_data,"");
@@ -163,7 +167,7 @@ void Plots::exportSettings(){
 
    QJsonDocument document(object);
    saveFile.write(document.toJson());
-
+   saveFile.close();
 }
 
 void Plots::importSettings(){
@@ -177,6 +181,10 @@ void Plots::importSettings(){
     }
 
     // before importing remove everything!!!!
+    int size = m_plots.size();
+    for (int i=0; i<size; i++){
+        deletePlot(0);
+    }
 
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Open settingsfile"), "/home", tr("UDP Logger Config Files (*.udpLoggerSettings)"));
@@ -254,7 +262,8 @@ void Plots::importSettings(){
         QString project_name = object["ProjectName"].toString();
         m_settings_dialog->readJSONObject(settings, project_name);
     }
-   }
+    file.close();
+}
 
 Plot* Plots::createNewPlot()
 {
@@ -268,12 +277,14 @@ Plot* Plots::createNewPlot()
 }
 
 void Plots::startUDP(){
-    m_udp->connectDataReady();
+    //m_udp->connectDataReady();
+    emit connectToReadyRead();
     m_ifudpLogging = 1;
 }
 
 void Plots::stopUDP(){
-    m_udp->disconnectDataReady();
+    //m_udp->disconnectDataReady();
+    emit disconnectToReadyRead();
     m_ifudpLogging=0;
 }
 
@@ -298,7 +309,7 @@ void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int ud
     m_port = port;
     m_export_data = export_data;
     changeDataBufferSize(data_buffersize, udp_buffersize);
-    m_udp->init(hostname,static_cast<quint16>(port),udp_buffersize, export_data, export_filename);
+    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize, export_data, export_filename);
 
     emit resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
 }

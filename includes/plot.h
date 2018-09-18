@@ -53,6 +53,7 @@ private:
     double m_ymax;
     double m_xmax;
     double m_xmin;
+    Signals* m_signals;
 
     int m_plot_buffer_index;
     int m_plot_buffersize;

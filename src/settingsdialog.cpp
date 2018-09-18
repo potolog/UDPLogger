@@ -84,7 +84,7 @@ void SettingsDialog::accepted(){
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, data_buffersize, plot_buffersize, port, export_data, export_filename);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, export_filename);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -135,6 +135,6 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
     ui->txt_project_name->setText(project_name);
     ui->txt_export_path->setText(object["ExportDataFile"].toString());
 
-    accepted();
+    emit accepted();
 
 }

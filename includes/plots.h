@@ -59,7 +59,9 @@ signals:
     void startUDPReadData();
     void newData2(unsigned long m_index_buffer);
     void resizePlotBuffer(int udp_buffersize, int plot_buffersize);
-
+    void connectToReadyRead();
+    void disconnectToReadyRead();
+    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename);
 private:
     QWidget* m_parent;
     QVector<Plot*> m_plots;

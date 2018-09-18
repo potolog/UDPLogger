@@ -30,12 +30,19 @@ UDP::UDP(Plots *parent, QMutex *mutex): m_mutex(mutex), m_parent(parent)
 {
     m_socket = new QUdpSocket(this);
     connect(this, &UDP::newData, m_parent, &Plots::newData);
+    connect(m_socket, &QUdpSocket::readyRead, this, &UDP::readData);
+    m_ifread_data = 0;
 }
 bool UDP::init(){
     return init(QHostAddress::AnyIPv4, 60000, 400, false, "");
 }
 
-bool UDP::init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename = ""){
+bool UDP::init(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data, QString filename){
+
+    //m_socket->~QUdpSocket();
+    //m_socket = new QUdpSocket(this);
+
+    m_socket->disconnectFromHost();
 
     m_data.resize(buffer_size);
     m_data_temp.resize(buffer_size);
@@ -78,7 +85,9 @@ void UDP::readData(){
     m_mutex->lock();
     m_data = m_data_temp;
     m_mutex->unlock();
-    emit newData();
+    if(m_ifread_data){
+        emit newData();
+    }
 
     if(m_if_file_ready){
         file->write(m_data_temp.data(), m_data_temp.size());
@@ -93,11 +102,11 @@ void UDP::readData(){
 }
 
 void UDP::connectDataReady(){
-    connect(m_socket, &QUdpSocket::readyRead, this, &UDP::readData);
+    m_ifread_data = 1;
 }
 
 void UDP::disconnectDataReady(){
-    disconnect(m_socket, &QUdpSocket::readyRead, this, &UDP::readData);
+    m_ifread_data = 0;
 }
 
 UDP::~UDP(){

@@ -30,6 +30,11 @@ struct Signal{
     int index;
 };
 
+struct input_arguments{
+    QString datatype;
+    QString variable_name;
+};
+
 // eventuell erweitern, dass signalnamen von datei eingelesen werden können.
 class Signals: public QObject
 {
@@ -41,16 +46,20 @@ public:
     void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals;}
     void importJSonFile(QString filename);
     int importXLSX(QString filename);
+private:
+    bool ifVariableNameExist(const QVector<struct input_arguments>& arguments, QString variable_name, bool& ifstruct);
+    void getInputArguments(QVector<struct input_arguments>& arguments);
+    void createMemcpyStrings(QVector<QString> &memcpy_strings);
 
 public slots:
     void importSignals();
+    void exportUDPFunction();
 
 signals:
     void signalsChanged();
 
 private:
    QVector<struct Signal> m_signals;
-
 };
 
 #endif // SIGNALS_H

@@ -60,6 +60,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(import_signals, &QAction::triggered, m_signal, &Signals::importSignals);
     menu->addAction(import_signals);
 
+    QAction *export_function = new QAction(tr("Export C/C++ Package function"), this);
+    connect(export_function, &QAction::triggered, m_signal, &Signals::exportUDPFunction);
+    menu->addAction(export_function);
+
     QAction *addPlot = new QAction(tr("&Add Plot"), this);
     addPlot->setStatusTip(tr("Wizard to create a new Plot"));
     connect(addPlot, &QAction::triggered, m_plots, &Plots::createNewPlot);

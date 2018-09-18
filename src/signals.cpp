@@ -30,28 +30,7 @@
 
 
 
-Signals::Signals(){
-    // nur zum testen
-        struct Signal signal;
-
-        signal.name = "double a";
-        signal.datatype = "double";
-        signal.offset = 0;
-        signal.index = 0;
-        m_signals.append(signal);
-
-        signal.name = "float c";
-        signal.datatype = "float";
-        signal.offset = 8;
-        signal.index = 1;
-        m_signals.append(signal);
-
-        signal.name = "inta";
-        signal.datatype = "int";
-        signal.offset = 12; // anzahl bytes offset
-        signal.index = 2;
-        m_signals.append(signal);
-}
+Signals::Signals(){}
 
 void Signals::importJSonFile(QString filename){
 
@@ -161,10 +140,121 @@ int Signals::importXLSX(QString filename){
 
 void Signals::importSignals(){
     QString fileName = QFileDialog::getOpenFileName(nullptr,
-        tr("Open Signals file"), "/home", tr("UDP Logger Config Files (*.udpLoggerSignals, *.xlsx)"));
+        tr("Open Signals file"), "/home", tr("SignalFiles(*.udpLoggerSignals, *.xlsx)"));
     if(fileName.split(".").last() == "xlsx"){
         importXLSX(fileName);
         return;
     }
     importJSonFile(fileName);
+}
+
+void Signals::exportUDPFunction(){
+
+    QString fileName = QFileDialog::getSaveFileName(nullptr,
+            tr("Export C Funktion"), "/home",
+            tr("C/C++ File (*.c, *.cpp)"));
+
+    QFile saveFile(fileName);
+
+   if (!saveFile.open(QIODevice::WriteOnly)) {
+       qWarning("Couldn't open save file.");
+   }
+
+    QVector<struct input_arguments> arguments;
+    QVector<QString> memcpy_variable;
+    QString function_name = "void createUDPPackage";
+    QVector<QString> includes;
+    includes.append("#include <string.h>\n");
+
+    struct input_arguments udp_buffer;
+    udp_buffer.datatype = "char*";
+    udp_buffer.variable_name = "udp_puffer";
+    arguments.append(udp_buffer);
+
+    getInputArguments(arguments);
+    createMemcpyStrings(memcpy_variable);
+
+
+    for(auto include: includes){
+        saveFile.write(include.toUtf8());
+    }
+
+    saveFile.write(function_name.toUtf8());
+    saveFile.write("(");
+    for (int i = 0; i<arguments.size(); i++){
+        struct input_arguments argument = arguments[i];
+
+        QString const_prefix;
+        QString reference;
+        if(i==0){
+            const_prefix = "";
+            reference = " ";
+        }else{
+            const_prefix = "const ";
+            reference = "* ";
+        }
+        saveFile.write(QString(const_prefix+argument.datatype+reference+argument.variable_name).toUtf8());
+        if(i<arguments.size()-1){
+            saveFile.write(", ");
+        }
+    }
+    saveFile.write("){\n");
+
+    for(auto memcpy: memcpy_variable){
+        saveFile.write(QString("\t"+memcpy).toUtf8());
+    }
+
+   saveFile.write("}");
+   saveFile.close();
+}
+
+void Signals::createMemcpyStrings(QVector<QString>& memcpy_strings){
+    QString prefix="memcpy(";
+    QString postfix = ");\n";
+
+    memcpy_strings.append("char* pointer = udp_buffer\n\n");
+
+    QString memcpy;
+    QString pointer;
+
+    for (auto signal : m_signals){
+        pointer = "pointer += " + QString::number(signal.offset)+";\n";
+        memcpy_strings.append(pointer);
+        memcpy = prefix+"pointer, "+ signal.name+", sizeof(*"+signal.name+")"+postfix;
+        memcpy_strings.append(memcpy);
+    }
+}
+
+bool Signals::ifVariableNameExist(const QVector<input_arguments>& arguments, QString variable_name, bool& ifstruct){
+    ifstruct = false;
+    for (auto argument : arguments){
+        if (argument.variable_name.compare(variable_name.split(".")[0])== 0){
+            return 1;
+        }
+
+        if(variable_name.split(".").size()>1){
+            ifstruct = true;
+        }
+    }
+    return 0;
+}
+
+void Signals::getInputArguments(QVector<struct input_arguments>& arguments){
+    // are variable with . in it's name --> struct
+   struct input_arguments argument;
+    for(auto signal : m_signals){
+        bool ifstruct;
+        if(ifVariableNameExist(arguments, signal.name, ifstruct)){
+            continue;
+        }
+
+        if(ifstruct){
+            argument.datatype = "struct";
+
+        }else{
+            argument.datatype = signal.datatype;
+        }
+        argument.variable_name = signal.name.split(".")[0]; // first is the highest struct name
+        arguments.append(argument);
+    }
 }

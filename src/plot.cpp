@@ -25,7 +25,7 @@
 #include "changegraphdialog.h"
 
 Plot::Plot(Plots* plots, QWidget* parent, int plot_buffersize,int udp_buffersize, int index, Signals *signal):
-    QCustomPlot(parent), m_index(index),m_parent(plots)
+    QCustomPlot(parent), m_index(index),m_parent(plots), m_signals(signal)
 {
 
     connect(this, &Plot::deletePlot2, plots, &Plots::deletePlot);
