@@ -1,4 +1,4 @@
-UDPLogger plots data which comes from the UDP socket. The signals in a UDP dataframe were defined in a .xlsx and will imported into the logger.
+UDPLogger plots data which comes from the UDP socket. The signals in a UDP dataframe were defined in a .xlsx and will imported into the logger. The first signal datas are the x-axis values.
 
 Features:
 - import and export Settings
