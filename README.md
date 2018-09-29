@@ -4,6 +4,7 @@ Features:
 - import and export Settings
 - save incomming data to file
 - change buffer sizes to improve performance
+- adding dynamically new plots
 
 ![alt text](https://github.com/Murmele/UDPLogger/blob/master/res/images/MainView.png)
 
@@ -12,3 +13,4 @@ TODO:
 - qgrip , resizing plots
 - different plot types
 - change x, y ranges by settings
+- export plots
