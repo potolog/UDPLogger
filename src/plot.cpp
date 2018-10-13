@@ -190,19 +190,19 @@ void Plot::newData(unsigned long index){
     double min_factor;
     double max_factor;
     if(m_ymin <0){
-        min_factor = (m_ymin -5)/m_ymin;
+        min_factor = 1; //(m_ymin -5)/m_ymin;
     }else if(m_ymin >0){
-        min_factor = (m_ymin -5)/m_ymin;
+        min_factor = 1; //(m_ymin -5)/m_ymin;
     }else {
-        min_factor = -5;
+        min_factor = 0;//-5;
     }
 
     if(m_ymax > 0){
-        max_factor = (m_ymax+5)/m_ymax;
+        max_factor = 1; //(m_ymax+5)/m_ymax;
     }else if(m_ymax <0){
-        max_factor = (m_ymax +5)/m_ymax;
+        max_factor = 1; //(m_ymax +5)/m_ymax;
     }else{
-        max_factor = 5;
+        max_factor = 0; //5;
     }
 
     yAxis->setRange(m_ymin*min_factor, m_ymax*max_factor);

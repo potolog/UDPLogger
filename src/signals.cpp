@@ -150,21 +150,55 @@ void Signals::importSignals(){
 
 void Signals::exportUDPFunction(){
 
-    QString fileName = QFileDialog::getSaveFileName(nullptr,
+    QString pathWithFileName = QFileDialog::getSaveFileName(nullptr,
             tr("Export C Funktion"), "/home",
             tr("C/C++ File (*.c, *.cpp)"));
 
-    QFile saveFile(fileName);
+    QStringList tempListPath = pathWithFileName.split("/");
+    QString file_name = tempListPath.last();
+    tempListPath.removeLast();
+    QString path = tempListPath.join("/");
 
-   if (!saveFile.open(QIODevice::WriteOnly)) {
-       qWarning("Couldn't open save file.");
-   }
+    QStringList tempList = file_name.split(".");
+    QString fileNameHeader = "";
+    QString fileNameDeclaration = "";
+
+    if(tempList.length() == 1){
+        fileNameHeader = file_name + ".h";
+        fileNameDeclaration = file_name + ".cpp";
+    }else{
+       fileNameDeclaration = file_name;
+       for (int i=0; i< tempList.length()-1; i++){ // last element of tempList is extension
+            fileNameHeader+= tempList[i];
+       }
+       fileNameHeader+= ".h";
+    }
+
+    QFile saveFileDefinition(path+"/"+fileNameHeader);
+    if (!saveFileDefinition.open(QIODevice::WriteOnly)) {
+       qWarning("Couldn't open header file.");
+    }
+
+    QFile saveFileDeclaration(path+"/"+fileNameDeclaration);
+    if (!saveFileDeclaration.open(QIODevice::WriteOnly)) {
+       qWarning("Couldn't open c/cpp file.");
+    }
+
 
     QVector<struct input_arguments> arguments;
     QVector<QString> memcpy_variable;
-    QString function_name = "void createUDPPackage";
+    QString function_name = "createUDPPackage";
+    QString function_return_value = "void";
     QVector<QString> includes;
     includes.append("#include <string.h>\n");
+    includes.append("#include <"+fileNameHeader.split("/")[fileNameHeader.split("/").length()-1]+">\n");
+
+    QByteArray array;
+    // Header ifndef ...
+    QString tempFileNameHeader = function_name.toUpper()+"_H";
+    array.append("#ifndef "+tempFileNameHeader+"\n");
+    array.append("#define "+tempFileNameHeader+"\n");
+    saveFileDefinition.write(array);
 
     struct input_arguments udp_buffer;
     udp_buffer.datatype = "char*";
@@ -176,11 +210,11 @@ void Signals::exportUDPFunction(){
 
 
     for(auto include: includes){
-        saveFile.write(include.toUtf8());
+        saveFileDeclaration.write(include.toUtf8());
     }
-
-    saveFile.write(function_name.toUtf8());
-    saveFile.write("(");
+    array.clear();
+    array.append(function_return_value+" "+function_name);
+    array.append("(");
     for (int i = 0; i<arguments.size(); i++){
         struct input_arguments argument = arguments[i];
 
@@ -193,19 +227,31 @@ void Signals::exportUDPFunction(){
             const_prefix = "const ";
             reference = "* ";
         }
-        saveFile.write(QString(const_prefix+argument.datatype+reference+argument.variable_name).toUtf8());
+        array.append(QString(const_prefix+argument.datatype+reference+argument.variable_name).toUtf8());
         if(i<arguments.size()-1){
-            saveFile.write(", ");
+            array.append(", ");
         }
     }
-    saveFile.write("){\n");
+    array.append(")");
+    saveFileDefinition.write(array+QString(";\n").toUtf8()); //write definition to file
+    array.append("{\n");
+
+    saveFileDeclaration.write(array);
 
     for(auto memcpy: memcpy_variable){
-        saveFile.write(QString("\t"+memcpy).toUtf8());
+        saveFileDeclaration.write(QString("\t"+memcpy).toUtf8());
     }
 
-   saveFile.write("}");
-   saveFile.close();
+   saveFileDeclaration.write("}");
+   saveFileDeclaration.close();
+
+   // Header File endif
+   array.clear();
+   array.append("#endif //"+ tempFileNameHeader);
+   saveFileDefinition.write(array);
+   saveFileDefinition.close();
+
+
 }
 
 void Signals::createMemcpyStrings(QVector<QString>& memcpy_strings){

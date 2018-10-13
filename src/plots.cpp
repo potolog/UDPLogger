@@ -135,9 +135,12 @@ void Plots::deletePlot(int index){
 }
 
 void Plots::exportSettings(){
-    QString fileName = QFileDialog::getSaveFileName(this,
+    QString select = tr("UDP Logger Config Files (*.udpLoggerSettings)");
+    QFileDialog filedialog;
+    filedialog.setDefaultSuffix(".udpLoggerSettings");
+    QString fileName = filedialog.getSaveFileName(this,
             tr("Export Settings"), "/home",
-            tr("UDP Logger Config Files (*.udpLoggerSettings)"));
+            select,&select);
 
 
     QJsonObject object;
@@ -341,6 +344,14 @@ void Plots::changeDataBufferSize(int data_buffersize, int udp_buffersize){
 }
 
 Plots::~Plots(){
+
+    // before importing remove everything!!!!
+    int size = m_plots.size();
+    for (int i=0; i<size; i++){
+        deletePlot(0);
+    }
+
+
     m_udp_thread.quit();
     m_udp_thread.wait(); // waiting till thread quits
     delete m_udp;

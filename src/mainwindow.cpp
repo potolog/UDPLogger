@@ -100,6 +100,7 @@ void MainWindow::disableStopUDP(){
 
 MainWindow::~MainWindow()
 {
+    delete m_plots;
     delete m_signal;
     delete ui;
 

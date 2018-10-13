@@ -33,7 +33,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->spinbox_port->setRange(0,65535);
     ui->spinbox_redraw_count->setRange(1,2147483647);
     ui->txt_hostaddress->setInputMask("000.000.000.000;_");
-    ui->spinbox_use_element_count->setRange(1,2147483647);
+    ui->spinbox_use_element_count->setRange(0,2147483647);
 
     ui->combo_hostname->addItem("address",QHostAddress::Null);
     ui->combo_hostname->addItem("AnyIPv4",QHostAddress::AnyIPv4);
