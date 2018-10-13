@@ -266,20 +266,29 @@ void Signals::createMemcpyStrings(QVector<QString>& memcpy_strings){
     for (auto signal : m_signals){
         pointer = "pointer += " + QString::number(signal.offset)+";\n";
         memcpy_strings.append(pointer);
-        memcpy = prefix+"pointer, "+ signal.name+", sizeof(*"+signal.name+")"+postfix;
+        if(!isStruct(signal.name)){
+            memcpy = prefix+"pointer, "+ signal.name+", sizeof(*"+signal.name+")"+postfix;
+        }else{
+            QString temp = signal.name;
+            temp.replace(temp.indexOf("."),1,"->");
+            memcpy = prefix+"pointer, &"+ temp+", sizeof("+temp+")"+postfix;
+        }
         memcpy_strings.append(memcpy);
     }
 }
 
+bool Signals::isStruct(QString variable_name){
+    if(variable_name.split(".").size()>1){
+        return true;
+    }
+    return false;
+}
+
 bool Signals::ifVariableNameExist(const QVector<input_arguments>& arguments, QString variable_name, bool& ifstruct){
-    ifstruct = false;
+    ifstruct = isStruct(variable_name);
     for (auto argument : arguments){
         if (argument.variable_name.compare(variable_name.split(".")[0])== 0){
             return 1;
-        }
-
-        if(variable_name.split(".").size()>1){
-            ifstruct = true;
         }
     }
     return 0;
