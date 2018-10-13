@@ -30,7 +30,10 @@
 
 
 
-Signals::Signals(){}
+Signals::Signals(){
+    m_c_path = "";
+    m_header_path = "";
+}
 
 void Signals::importJSonFile(QString filename){
 
@@ -151,13 +154,14 @@ void Signals::importSignals(){
 void Signals::exportUDPFunction(){
 
     QString pathWithFileName = QFileDialog::getSaveFileName(nullptr,
-            tr("Export C Funktion"), "/home",
+            tr("Export C Funktion"), m_c_path,
             tr("C/C++ File (*.c, *.cpp)"));
 
     QStringList tempListPath = pathWithFileName.split("/");
     QString file_name = tempListPath.last();
     tempListPath.removeLast();
     QString path = tempListPath.join("/");
+    m_c_path = path;
 
     QStringList tempList = file_name.split(".");
     QString fileNameHeader = "";
@@ -174,12 +178,12 @@ void Signals::exportUDPFunction(){
        fileNameHeader+= ".h";
     }
 
-    QFile saveFileDefinition(path+"/"+fileNameHeader);
+    QFile saveFileDefinition(m_c_path+"/"+m_header_path+"/"+fileNameHeader);
     if (!saveFileDefinition.open(QIODevice::WriteOnly)) {
        qWarning("Couldn't open header file.");
     }
 
-    QFile saveFileDeclaration(path+"/"+fileNameDeclaration);
+    QFile saveFileDeclaration(m_c_path+"/"+fileNameDeclaration);
     if (!saveFileDeclaration.open(QIODevice::WriteOnly)) {
        qWarning("Couldn't open c/cpp file.");
     }
@@ -312,4 +316,8 @@ void Signals::getInputArguments(QVector<struct input_arguments>& arguments){
         argument.variable_name = signal.name.split(".")[0]; // first is the highest struct name
         arguments.append(argument);
     }
+}
+
+void Signals::changeRelativeHeaderPath(QString relative_header_path){
+    m_header_path = relative_header_path;
 }

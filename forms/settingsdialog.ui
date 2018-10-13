@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>491</height>
+    <width>539</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -215,6 +215,20 @@
         <double>2147483647.000000000000000</double>
        </property>
       </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <item>
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relativ path from header file&lt;/p&gt;&lt;p&gt;to declaration file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txt_relative_header_path"/>
      </item>
     </layout>
    </item>

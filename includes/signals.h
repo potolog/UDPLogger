@@ -46,6 +46,7 @@ public:
     void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals;}
     void importJSonFile(QString filename);
     int importXLSX(QString filename);
+    bool isStruct(QString variablename);
 private:
     bool ifVariableNameExist(const QVector<struct input_arguments>& arguments, QString variable_name, bool& ifstruct);
     void getInputArguments(QVector<struct input_arguments>& arguments);
@@ -54,12 +55,15 @@ private:
 public slots:
     void importSignals();
     void exportUDPFunction();
+    void changeRelativeHeaderPath(QString relative_header_path);
 
 signals:
     void signalsChanged();
 
 private:
    QVector<struct Signal> m_signals;
+   QString m_header_path;
+   QString m_c_path;
 };
 
 #endif // SIGNALS_H

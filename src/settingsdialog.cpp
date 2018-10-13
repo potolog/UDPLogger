@@ -39,6 +39,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->combo_hostname->addItem("AnyIPv4",QHostAddress::AnyIPv4);
     ui->combo_hostname->addItem("LocalHost",QHostAddress::LocalHost);
     ui->combo_hostname->addItem("Broadcast",QHostAddress::Broadcast);
+    ui->txt_relative_header_path->setText("");
 
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accepted);
@@ -77,6 +78,7 @@ void SettingsDialog::accepted(){
     int redraw_count;
     bool export_data;
     int use_data_count;
+    QString relative_header_path;
 
     udp_buffersize = static_cast<int>(ui->spinbox_udp_buffer->value());
     plot_buffersize = static_cast<int>(ui->spinbox_plot_buffer->value());
@@ -85,12 +87,13 @@ void SettingsDialog::accepted(){
     port = static_cast<int>(ui->spinbox_port->value());
     export_data = ui->checkbox_export_data->isChecked();
     use_data_count = static_cast<int>(ui->spinbox_use_element_count->value());
+    relative_header_path = ui->txt_relative_header_path->text();
 
     QHostAddress hostname(ui->txt_hostaddress->text());
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, redraw_count, use_data_count, export_filename);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, redraw_count, use_data_count, export_filename,relative_header_path);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -127,6 +130,7 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["ExportDataFile"] =ui->txt_export_path->text();
     object["RedrawCount"] = static_cast<int>(ui->spinbox_redraw_count->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
+    object["relative_header_path"] = ui->txt_relative_header_path->text();
 }
 
 void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
@@ -136,6 +140,7 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
     ui->checkbox_export_data->setChecked(object["ExportData"].toBool());
     ui->spinbox_redraw_count->setValue(static_cast<double>(object["RedrawCount"].toInt()));
     ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
+    ui->txt_relative_header_path->setText(object["relative_header_path"].toString());
 
     QJsonObject network_settings = object["NetworkSettings"].toObject();
     ui->txt_hostaddress->setText(QHostAddress(network_settings["HostAddress"].toString()).toString());

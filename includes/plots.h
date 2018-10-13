@@ -57,7 +57,7 @@ public slots:
     void settings();
     void startUDP();
     void stopUDP();
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename);
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename, QString relative_header_path);
 signals:
     void startUDPReadData();
     void newData2(unsigned long m_index_buffer);
@@ -65,6 +65,7 @@ signals:
     void connectToReadyRead();
     void disconnectToReadyRead();
     void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data,int m_use_data_count, QString filename);
+    void changeRelativeHeaderPath(QString relative_header_path);
 private:
     QWidget* m_parent;
     QVector<Plot*> m_plots;
