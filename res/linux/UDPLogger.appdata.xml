@@ -15,7 +15,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">com.github.Murmele.UDPLogger</launchable>
+  <launchable type="desktop-id">com.github.Murmele.UDPLogger.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
