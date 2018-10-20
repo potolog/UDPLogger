@@ -29,30 +29,14 @@
 
 Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(signal)
 {
-    m_program_version = "1.0";
-    m_project_name = "Project1";
     m_layout = new QVBoxLayout(parent);
     m_index_buffer = 0;
     m_index_new_data = 0;
     m_ifudpLogging = false;
     m_use_data_count = 0;
 
-    int port = 60000;
-    int udp_buffersize = 400;
-    int plot_buffersize = 200;
-    int data_buffersize = 500;
-    m_plot_buffersize = plot_buffersize;
-    m_udp_buffersize = udp_buffersize;
-    m_data_buffersize = data_buffersize;
-    m_export_data = false;
-
-    changeDataBufferSize(m_plot_buffersize,m_udp_buffersize);
-    m_port = port;
-    m_hostaddress = QHostAddress::Any;
-
     m_mutex = new QMutex;
     m_udp = new UDP(this, m_mutex);
-    m_udp->init();
 
     m_udp->moveToThread(&m_udp_thread);
     m_udp_thread.start();
@@ -65,7 +49,6 @@ Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(sign
     connect(this, &Plots::changeRelativeHeaderPath, signal, &Signals::changeRelativeHeaderPath);
 
     m_settings_dialog = new SettingsDialog(this);
-    m_settings_dialog->setSettings(m_project_name, m_hostaddress, m_udp_buffersize, m_plot_buffersize,m_data_buffersize, m_port, m_export_data,"");
 }
 
 void Plots::newData(){

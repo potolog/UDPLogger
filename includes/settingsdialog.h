@@ -39,6 +39,7 @@ public:
     void setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename);
     void createJSONObject(QJsonObject& object);
     void readJSONObject(QJsonObject& object, QString project_name);
+    void initSettings();
     ~SettingsDialog();
 private slots:
     void comboHostnameIndexChanged(int index);

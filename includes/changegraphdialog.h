@@ -31,7 +31,7 @@ struct SettingsGraph{
     int scatterstyle;
     struct Signal signal;
     QString name;
-
+    struct Signal signal_xaxis;
 };
 
 namespace Ui {
@@ -46,6 +46,7 @@ public:
     explicit changeGraphDialog(Plot* parent_plot, QWidget* parent, Signals *signal);
     void saveOldSettings();
     struct SettingsGraph getSettings(int index){return m_settings[index];}
+    int getSignalCount(){return m_settings.count();}
     void updateSignals();
 
     ~changeGraphDialog();

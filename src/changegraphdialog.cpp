@@ -71,6 +71,7 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
         ui->combo_scatter_style->setEnabled(false);
         ui->txt_name->setEnabled(false);
         ui->combo_signalname->setEnabled(false);
+        ui->combo_signalname_xaxis->setEnabled(false);
     }
 
     m_previous_row = -1;
@@ -199,6 +200,7 @@ void changeGraphDialog::apply(){
         m_settings_new[row].scatterstyle = ui->combo_scatter_style->currentData().toInt();
         m_settings_new[row].name =ui->txt_name->toPlainText();
         m_settings_new[row].signal = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
+        m_settings_new[row].signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->currentData().toInt());
     }
 
 
@@ -208,7 +210,6 @@ void changeGraphDialog::apply(){
         m_parent->graph(i)->setScatterStyle(value);
         m_parent->graph(i)->setName(m_settings_new[i].name);
         m_parent->graph(i)->setPen(QPen(QColor(m_settings_new[i].color)));
-        m_parent->getSignalSettings()->replace(i,m_settings_new[i].signal);
     }
 
 
@@ -221,6 +222,7 @@ void changeGraphDialog::apply(){
         settings.color = m_settings_new[i].color;
         settings.name = m_settings_new[i].name;
         settings.signal = m_settings_new[i].signal;
+        settings.signal_xaxis = m_settings_new[i].signal_xaxis;
 
         m_settings.append(settings);
     }
@@ -239,7 +241,6 @@ void changeGraphDialog::deleteElement(){
     delete item;
     m_settings.remove(row);
     m_settings_new.remove(row);
-    m_parent->getSignalSettings()->remove(row);
     m_parent->removeData(row);
     m_parent->removeGraph(m_parent->graph(row));
 }
@@ -282,15 +283,16 @@ void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr
             return;
         }
         settings.signal = m_signals->getSignal(ui->combo_signalname->itemData(0).toInt());
+        settings.signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->itemData(0).toInt());
     }else{
         settings.linestyle = settings_import->linestyle;
         settings.scatterstyle = settings_import->scatterstyle;
         settings.color = settings_import->color;
         settings.name = settings_import->name;
         settings.signal = settings_import->signal;
+        settings.signal_xaxis = settings_import->signal;
     }
     ui->listWidget->addItem(settings.name);
-    m_parent->getSignalSettings()->append(settings.signal);
     m_parent->addGraph();
 
     m_parent->graph(m_parent->graphCount()-1)->setLineStyle(static_cast<QCPGraph::LineStyle>(settings.linestyle));
@@ -312,14 +314,17 @@ void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr
     ui->combo_scatter_style->setEnabled(true);
     ui->txt_name->setEnabled(true);
     ui->combo_signalname->setEnabled(true);
+    ui->combo_signalname_xaxis->setEnabled(true);
 }
 
 void changeGraphDialog::updateSignals(){
     ui->combo_signalname->clear();
+    ui->combo_signalname_xaxis->clear();
     struct Signal signal_temp;
     for (int i=0; i< m_signals->getSignalCount(); i++){
         signal_temp = m_signals->getSignal(i);
         ui->combo_signalname->addItem(signal_temp.name,i);
+        ui->combo_signalname_xaxis->addItem(signal_temp.name,i);
     }
 }
 

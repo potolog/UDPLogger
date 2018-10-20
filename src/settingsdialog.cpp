@@ -33,7 +33,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->spinbox_port->setRange(0,65535);
     ui->spinbox_redraw_count->setRange(1,2147483647);
     ui->txt_hostaddress->setInputMask("000.000.000.000;_");
-    ui->spinbox_use_element_count->setRange(0,2147483647);
+    ui->spinbox_use_element_count->setRange(1,2147483647);
 
     ui->combo_hostname->addItem("address",QHostAddress::Null);
     ui->combo_hostname->addItem("AnyIPv4",QHostAddress::AnyIPv4);
@@ -45,6 +45,9 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accepted);
     connect(this, &SettingsDialog::settingsAccepted, parent, &Plots::settingsAccepted);
     connect(ui->combo_hostname, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsDialog::comboHostnameIndexChanged);
+
+    initSettings();
+    accepted(); // initially setting settings
 }
 
 void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename){
@@ -57,7 +60,17 @@ void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, in
     ui->txt_project_name->setText(project_name);
     ui->checkbox_export_data->setChecked(export_data);
     ui->txt_export_path->setText(export_filename);
+}
 
+void SettingsDialog::initSettings(){
+    QString project_name = "Project1";
+    QHostAddress hostaddress = QHostAddress::Any;
+    int udp_buffersize = 400;
+    int plot_buffersize = 200;
+    int data_buffersize = 500;
+    int port = 60000;
+    bool export_data = false;
+    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize,data_buffersize, port, export_data,"");
 }
 
 void SettingsDialog::comboHostnameIndexChanged(int index){

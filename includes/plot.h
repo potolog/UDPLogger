@@ -34,7 +34,6 @@ public:
     void mousePressEvent(QMouseEvent *ev);
     void addGraphToPlot(struct SettingsGraph* settings);
     bool ifNameExists(QString name);
-    QVector<struct Signal>* getSignalSettings(){return &m_signal_settings;}
     void appendYData();
 
     void removeData(int index){m_y_data.remove(index);}
@@ -48,7 +47,6 @@ private:
     PlotsContextMenu* m_context_menu;
     QMenu* m_menu;
     changeGraphDialog* m_changegpraph_dialog;
-    QVector<struct Signal> m_signal_settings;
     double m_ymin;
     double m_ymax;
     double m_xmax;

@@ -120,16 +120,17 @@ void Plot::resizePlotBuffer(int udp_buffersize, int plot_buffersize){
 
 void Plot::newData(unsigned long index){
 // process new data
+    struct Signal signal;
 
     for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
-
+        signal = m_changegpraph_dialog->getSettings(0).signal_xaxis;
         if (j<0){
             j= m_parent->getDataBufferSize()-j;
         }
 
-        if(m_signal_settings.count()>0){
+        if(m_changegpraph_dialog->getSignalCount()>0){
             // first double is x Axis
-            double x_val = m_parent->getBufferData(j,0);
+            double x_val = m_parent->getBufferData(j,signal.index);
             m_x_data.append(x_val);
             if(x_val > m_xmax){
                 m_xmax = x_val;
@@ -146,9 +147,9 @@ void Plot::newData(unsigned long index){
 
 
 
-    struct Signal signal;
+
     for(unsigned int i=0; i<graphCount(); i++){
-        signal = m_signal_settings.at(i);
+        signal = m_changegpraph_dialog->getSettings(i).signal;
 
         for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
 
