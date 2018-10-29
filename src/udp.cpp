@@ -53,7 +53,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, bool
         msgBox.setText("Hostaddress or Port not valid: "+m_socket->errorString());
         msgBox.exec();
         std::cout << "Bind: NOK" << std::endl;
-        return -1;
+        return 0;
     }
 
     std::cout << "Bind: OK" << std::endl;
@@ -68,7 +68,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, bool
             //file.write();
         }
     }
-    return 0;
+    return 1;
 }
 
 void UDP::readData(){
