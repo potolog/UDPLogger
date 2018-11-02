@@ -26,6 +26,7 @@
 struct Signal{
     QString name;
     QString datatype;
+    QString unit;
     int offset; // in receive Byte
     int index;
 };
@@ -52,12 +53,12 @@ private:
     void getInputArguments(QVector<struct input_arguments>& arguments);
     void createMemcpyStrings(QVector<QString> &memcpy_strings);
 
-public slots:
+public Q_SLOTS:
     void importSignals();
     void exportUDPFunction();
     void changeRelativeHeaderPath(QString relative_header_path);
 
-signals:
+Q_SIGNALS:
     void signalsChanged();
 
 private:

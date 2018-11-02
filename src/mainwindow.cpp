@@ -24,6 +24,10 @@
 #include <iostream>
 #include "udp.h"
 #include "signals.h"
+#include <QDockWidget>
+#include "triggerwidget.h"
+
+#include <Python.h>
 
 using namespace std;
 
@@ -38,8 +42,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     m_signal = new Signals;
 
-    m_plots = new Plots(ui->centralWidget,m_signal);
+    m_trigger_menu = new QDockWidget(tr("Store signals to file trigger"),this);
+    connect(m_trigger_menu, &QDockWidget::visibilityChanged, this,&MainWindow::changedDockVisibility);
+    TriggerWidget* triggerwidget = new TriggerWidget(m_signal,m_trigger_menu);
+    connect(m_signal, &Signals::signalsChanged, triggerwidget,&TriggerWidget::updateSignals);
+    m_trigger_menu->setWidget(triggerwidget);
+    addDockWidget(Qt::RightDockWidgetArea,m_trigger_menu);
+    m_trigger_menu->show();
 
+    readSettings();
+
+    m_plots = new Plots(ui->centralWidget,m_signal, triggerwidget);
     m_vlayout->addWidget(m_plots);
     ui->centralWidget->setLayout(m_vlayout);
 
@@ -85,6 +98,15 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(settings_widget, &QAction::triggered, m_plots, &Plots::settings);
     ui->menuBar->addAction(settings_widget);
 
+    // Begin Menu "View"
+    QMenu* view_menu = ui->menuBar->addMenu(tr("View"));
+
+    m_show_trigger_dock = new QAction(tr("Trigger dock"),this);
+    m_show_trigger_dock->setCheckable(true);
+    m_show_trigger_dock->setChecked(true);
+    view_menu->addAction(m_show_trigger_dock);
+    connect(m_show_trigger_dock, &QAction::toggled, this, &MainWindow::changeDockVisibility);
+
     disableStopUDP();
 }
 
@@ -98,10 +120,39 @@ void MainWindow::disableStopUDP(){
     m_stop_udp->setEnabled(false);
 }
 
+void MainWindow::writeSettings(){
+    QSettings settings("Murmele", "com.github.Murmele.UDPLogger");
+
+    settings.beginGroup("mainWindow");
+    settings.setValue("geometry",saveGeometry());
+    settings.setValue("state", saveState());
+    settings.endGroup();
+}
+
+void MainWindow::readSettings(){
+    QSettings settings("Murmele", "com.github.Murmele.UDPLogger");
+    settings.beginGroup("mainWindow");
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("state").toByteArray());
+    settings.endGroup();
+}
+
 MainWindow::~MainWindow()
 {
+    writeSettings();
     delete m_plots;
     delete m_signal;
     delete ui;
 
+}
+
+void MainWindow::changeDockVisibility(bool checked){
+    Q_UNUSED(checked);
+    m_trigger_menu->setVisible(m_show_trigger_dock->isChecked());
+
+}
+
+void MainWindow::changedDockVisibility(bool visible){
+    Q_UNUSED(visible);
+    m_show_trigger_dock->setChecked(m_trigger_menu->isVisible());
 }

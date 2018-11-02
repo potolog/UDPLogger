@@ -41,13 +41,13 @@ public:
     void readJSONObject(QJsonObject& object, QString project_name);
     void initSettings();
     ~SettingsDialog();
-private slots:
+private Q_SLOTS:
     void comboHostnameIndexChanged(int index);
     void accepted();
     void on_txt_export_path_textChanged(const QString &arg1);
     void on_btn_browse_export_file_clicked();
 
-signals:
+Q_SIGNALS:
     void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int skip_element,QString export_filename, QString relative_header_path);
 
 private:

@@ -22,6 +22,7 @@
 #include <QMouseEvent>
 #include "signals.h"
 #include "qcustomplot.h"
+#include "changegraphdialog.h"
 
 class Plots;
 class changeGraphDialog;
@@ -30,16 +31,27 @@ class PlotsContextMenu;
 class Plot : public QCustomPlot{
     Q_OBJECT
 public:
-    Plot(Plots* plots, QWidget* parent, int plot_buffersize, int udp_buffersize, int index, Signals* signal);
+    Plot(Plots* plots, QWidget* parent, int index, Signals* signal);
     void mousePressEvent(QMouseEvent *ev);
     void addGraphToPlot(struct SettingsGraph* settings);
     bool ifNameExists(QString name);
-    void appendYData();
-
-    void removeData(int index){m_y_data.remove(index);}
+    void deleteGraph(struct Signal xaxis,struct Signal yaxis, int index);
     void writeJSON(QJsonObject &object);
 
     ~Plot();
+private Q_SLOTS:
+    void ShowContextMenu(const QPoint& pos);
+    void deletePlot();
+    void clearPlot();
+    void changeGraphStyle();
+public Q_SLOTS:
+    void newData();
+    void signalsChanged();
+    void newGraph(struct SettingsGraph settings);
+    void changeGraphSettings(int index_graph, struct SettingsGraph new_settings, struct SettingsGraph old_settings, bool remove_signal);
+Q_SIGNALS:
+    void deletePlot2(int index);
+    void removeSignal(struct Signal xaxis,struct Signal yaxis);
 
 private:
     int m_index;
@@ -47,33 +59,12 @@ private:
     PlotsContextMenu* m_context_menu;
     QMenu* m_menu;
     changeGraphDialog* m_changegpraph_dialog;
-    double m_ymin;
-    double m_ymax;
-    double m_xmax;
-    double m_xmin;
     Signals* m_signals;
 
     int m_plot_buffer_index;
     int m_plot_buffersize;
     int m_udp_buffersize;
     int buffer_index;
-    QVector<QVector<double>> m_y_data;
-    QVector<double> m_x_data;
-
-private slots:
-    void ShowContextMenu(const QPoint& pos);
-    void deletePlot();
-    void clearPlot();
-    void changeGraphStyle();
-public slots:
-    void newData(unsigned long index);
-    void resizePlotBuffer(int udp_buffersize, int plot_buffersize);
-    void signalsChanged();
-
-
-signals:
-    void deletePlot2(int index);
-
 };
 
 #endif // PLOT_H

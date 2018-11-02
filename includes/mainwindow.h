@@ -41,9 +41,13 @@ public:
     void addPlot();
     void clearData();
     void plot();
- public slots:
+    void writeSettings();
+    void readSettings();
+ public Q_SLOTS:
     void disableStartUDP();
     void disableStopUDP();
+    void changeDockVisibility(bool checked);
+    void changedDockVisibility(bool visible);
 
 
 private:
@@ -55,10 +59,8 @@ private:
     Signals* m_signal;
     QAction* m_start_udp;
     QAction* m_stop_udp;
-
-
-
-
+    QAction* m_show_trigger_dock;
+    QDockWidget* m_trigger_menu;
 };
 
 #endif // MAINWINDOW_H

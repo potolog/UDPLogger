@@ -61,7 +61,7 @@ void Signals::importJSonFile(QString filename){
         }
         setSignals(&signal_vector);
 
-        emit signalsChanged();
+        Q_EMIT signalsChanged();
     }
 
 
@@ -137,13 +137,16 @@ int Signals::importXLSX(QString filename){
 
     m_signals.clear();
     m_signals = new_signals;
-    emit signalsChanged();
+    Q_EMIT signalsChanged();
     return 0;
 }
 
 void Signals::importSignals(){
     QString fileName = QFileDialog::getOpenFileName(nullptr,
         tr("Open Signals file"), "/home", tr("SignalFiles(*.udpLoggerSignals, *.xlsx)"));
+    if(fileName.compare("")==0)
+        return;
+
     if(fileName.split(".").last() == "xlsx"){
         importXLSX(fileName);
         return;
@@ -156,6 +159,10 @@ void Signals::exportUDPFunction(){
     QString pathWithFileName = QFileDialog::getSaveFileName(nullptr,
             tr("Export C Funktion"), m_c_path,
             tr("C/C++ File (*.c, *.cpp)"));
+
+    if(pathWithFileName.compare("")==0){
+        return;
+    }
 
     QStringList tempListPath = pathWithFileName.split("/");
     QString file_name = tempListPath.last();

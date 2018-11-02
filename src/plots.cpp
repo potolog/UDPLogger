@@ -26,8 +26,9 @@
 #include "settingsdialog.h"
 #include "plot.h"
 #include "changegraphdialog.h"
+#include "triggerwidget.h"
 
-Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(signal)
+Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent(parent), m_signals(signal)
 {
     m_layout = new QVBoxLayout(parent);
     m_index_buffer = 0;
@@ -35,69 +36,36 @@ Plots::Plots(QWidget *parent, Signals* signal): m_parent(parent), m_signals(sign
     m_ifudpLogging = false;
     m_use_data_count = 0;
 
+    m_data_buffers = new PlotBuffers(signal);
+
     m_mutex = new QMutex;
-    m_udp = new UDP(this, m_mutex);
+    m_udp = new UDP(this, m_mutex,m_data_buffers, signal, trigger);
+
+
 
     m_udp->moveToThread(&m_udp_thread);
     m_udp_thread.start();
-    //m_ifudpLogging = 1;
-    //m_udp->connectDataReady();
+
     connect(this, &Plots::connectToReadyRead, m_udp, &UDP::connectDataReady, Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
     qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
-    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int, bool,int, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
+    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, bool,int, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::changeRelativeHeaderPath, signal, &Signals::changeRelativeHeaderPath);
+
+    connect(this, &Plots::dataBufferSizeChanged, m_data_buffers, &PlotBuffers::dataBufferSizeChanged);
+
 
     m_settings_dialog = new SettingsDialog(this);
 }
 
-void Plots::newData(){
-    if(m_index_buffer >= m_data_buffersize){
-        m_index_buffer = 0;
-    }
-    m_mutex->lock();
-    struct Signal signal;
-    for (int i=0; i<m_signals->getSignalCount(); i++){
-        signal = m_signals->getSignal(i);
+QSharedPointer<QCPGraphDataContainer> Plots::getBuffer(struct Signal xaxis, struct Signal yaxis){
 
-        double value;
-        if(signal.datatype.compare("float")== 0){
-            float temp =*m_udp->getFloatPointer(signal.offset);
-            value = static_cast<double>(temp);
+    QSharedPointer<QCPGraphDataContainer> pointer = m_data_buffers->getBuffer(xaxis, yaxis);
+    return pointer;
+}
 
-        }else if(signal.datatype.compare("double")==0){
-            value = *m_udp->getDoublePointer(signal.offset);
-
-        }else if(signal.datatype.compare("char")==0){
-            char temp = *m_udp->getCharPointer(signal.offset);
-            value = static_cast<double>(temp);
-
-        }else if(signal.datatype.compare("int")==0){
-            int temp = *m_udp->getIntPointer(signal.offset);
-            value = static_cast<double>(temp);
-        }else{
-            value = 0; // not defined
-        }
-
-        m_data_buffer[m_index_buffer][i] = value;
-    }
-    m_mutex->unlock();
-
-    unsigned long difference;
-    if(m_index_buffer < m_index_new_data){
-        difference = m_data_buffersize -m_index_new_data+m_index_buffer;
-    }else{
-        difference = m_index_buffer - m_index_new_data;
-    }
-
-
-    if(difference >= static_cast<unsigned long>(m_redraw_count)-1){
-        m_index_new_data = m_index_buffer;
-        emit newData2(m_index_buffer);
-    }
-
-    m_index_buffer++;
-
+void Plots::removeGraph(struct Signal xaxis, struct Signal yaxis){
+    m_data_buffers->removeGraph(xaxis, yaxis);
 }
 
 void Plots::deletePlot(int index){
@@ -109,9 +77,8 @@ void Plots::deletePlot(int index){
     item = m_layout->takeAt( index );
     qDebug() << "Item -> widget(): " <<item->widget();
     if(item->widget() == m_plots.at(index)){
-        returnvalue = disconnect(this, &Plots::newData2, m_plots.at(index), &Plot::newData);
+        returnvalue = disconnect(m_data_buffers, &PlotBuffers::dataChanged, m_plots.at(index), &Plot::newData);
         returnvalue = disconnect(m_signals, &Signals::signalsChanged, m_plots.at(index), &Plot::signalsChanged);
-        disconnect(this, &Plots::resizePlotBuffer, m_plots.at(index), &Plot::resizePlotBuffer);
         qDebug() << "Deleting Object";
         item->widget()->deleteLater();
         m_plots.remove(index);
@@ -126,7 +93,8 @@ void Plots::exportSettings(){
             tr("Export Settings"), "/home",
             select,&select);
 
-
+    if(fileName.compare("") == 0)
+        return;
     QJsonObject object;
 
     object["ProjectName"] = m_project_name;
@@ -190,6 +158,9 @@ void Plots::importSettings(){
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Open settingsfile"), "/home", tr("UDP Logger Config Files (*.udpLoggerSettings)"));
 
+    if(fileName.compare("")==0)
+        return;
+
     QFile file;
     file.setFileName(fileName);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
@@ -243,7 +214,7 @@ void Plots::importSettings(){
                         signal.index = signal_settings["Index"].toInt();
                         signal.offset = signal_settings["Offset"].toInt();
                         signal.name = signal_settings["Signalname"].toString();
-                        settings.signal = signal;
+                        settings.signal_yaxis = signal;
 
                         m_plots[i]->addGraphToPlot(&settings);
                     }else{
@@ -268,24 +239,22 @@ void Plots::importSettings(){
 
 Plot* Plots::createNewPlot()
 {
-    Plot* plot = new Plot(this, m_parent, m_plot_buffersize,m_udp_buffersize, m_plots.length(),m_signals);
-    connect(this, &Plots::resizePlotBuffer, plot, &Plot::resizePlotBuffer);
+    Plot* plot = new Plot(this, m_parent, m_plots.length(),m_signals);
+    connect(plot, &Plot::removeSignal, m_data_buffers, &PlotBuffers::removeSignal);
     m_plots.append(plot);
     m_layout->addWidget(plot);
-    connect(this, &Plots::newData2, plot, &Plot::newData);
+    connect(m_data_buffers, &PlotBuffers::dataChanged, plot, &Plot::newData);
     connect(m_signals, &Signals::signalsChanged, plot, &Plot::signalsChanged);
     return plot;
 }
 
 void Plots::startUDP(){
-    //m_udp->connectDataReady();
-    emit connectToReadyRead();
+    Q_EMIT connectToReadyRead();
     m_ifudpLogging = 1;
 }
 
 void Plots::stopUDP(){
-    //m_udp->disconnectDataReady();
-    emit disconnectToReadyRead();
+    Q_EMIT disconnectToReadyRead();
     m_ifudpLogging=0;
 }
 
@@ -313,9 +282,10 @@ void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int ud
     m_use_data_count = use_data_count;
     changeRelativeHeaderPath(relative_header_path);
     changeDataBufferSize(data_buffersize, udp_buffersize);
-    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize, export_data,use_data_count, export_filename);
+    Q_EMIT dataBufferSizeChanged(data_buffersize);
+    Q_EMIT initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,redraw_count, export_data,use_data_count, export_filename);
 
-    emit resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
+    Q_EMIT resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
 }
 
 void Plots::changeDataBufferSize(int data_buffersize, int udp_buffersize){
@@ -341,4 +311,5 @@ Plots::~Plots(){
     m_udp_thread.wait(); // waiting till thread quits
     delete m_udp;
     delete m_mutex;
+    delete m_data_buffers;
 }

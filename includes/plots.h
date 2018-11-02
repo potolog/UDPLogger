@@ -24,12 +24,14 @@
 #include <array>
 #include <QHostAddress>
 #include <QtWidgets>
+#include "plotbuffer.h"
 
 class UDP;
 class QMutex;
 class QJsonObject;
 class SettingsDialog;
 class Plot;
+class TriggerWidget;
 
 
 class Plots: public QWidget
@@ -37,35 +39,36 @@ class Plots: public QWidget
     Q_OBJECT
 
 public:
-    Plots(QWidget *parent, Signals* signal);
+    Plots(QWidget *parent, Signals* signal, TriggerWidget *trigger);
     QVBoxLayout* getLayout(){return m_layout;}
     Plot* createNewPlot();
-    double* getBufferData(){return m_data_buffer.data()->data();}
-    double getBufferData(int row, int column){return m_data_buffer[row][column];}
-    unsigned long getbufferIndex(){return m_index_buffer;}
-    int getBufferCount(){return m_udp_buffersize;}
+    inline double* getBufferData(){return m_data_buffer.data()->data();}
+    inline double getBufferData(int row, int column){return m_data_buffer[row][column];}
+    inline unsigned long getbufferIndex(){return m_index_buffer;}
+    inline int getBufferCount(){return m_udp_buffersize;}
     void changeDataBufferSize(int data_buffersize, int udp_buffersize);
-    int getRedrawCounter(){return m_redraw_count;}
-    int getDataBufferSize(){return m_data_buffersize;}
-    int getSkipElement(){return m_use_data_count;}
+    inline int getRedrawCounter(){return m_redraw_count;}
+    inline int getDataBufferSize(){return m_data_buffersize;}
+    inline int getSkipElement(){return m_use_data_count;}
     ~Plots();
-public slots:
+    void removeGraph(struct Signal xaxis, struct Signal yaxis);
+    QSharedPointer<QCPGraphDataContainer> getBuffer(struct Signal xaxis, struct Signal yaxis);
+public Q_SLOTS:
     void deletePlot(int index);
-    void newData();
     void exportSettings();
     void importSettings();
     void settings();
     void startUDP();
     void stopUDP();
     void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename, QString relative_header_path);
-signals:
+Q_SIGNALS:
     void startUDPReadData();
-    void newData2(unsigned long m_index_buffer);
     void resizePlotBuffer(int udp_buffersize, int plot_buffersize);
     void connectToReadyRead();
     void disconnectToReadyRead();
-    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size, bool export_data,int m_use_data_count, QString filename);
+    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size,int data_size, int redraw_count, bool export_data,int m_use_data_count, QString filename);
     void changeRelativeHeaderPath(QString relative_header_path);
+    void dataBufferSizeChanged(int data_buffer_size);
 private:
     QWidget* m_parent;
     QVector<Plot*> m_plots;
@@ -93,6 +96,8 @@ private:
     unsigned long m_index_buffer;
     int m_data_buffersize;
     QVector<QVector<double>> m_data_buffer;
+
+    PlotBuffers *m_data_buffers;
 
 };
 

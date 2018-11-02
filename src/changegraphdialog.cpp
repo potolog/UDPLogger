@@ -63,6 +63,15 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
     ui->combo_linestyle->addItem("QCPGraph::LineStyle::lsStepCenter",QCPGraph::LineStyle::lsStepCenter);
     ui->combo_linestyle->addItem("QCPGraph::LineStyle::lsImpulse",QCPGraph::LineStyle::lsImpulse);
 
+    ui->spinbox_y_max->setRange(-4294967296,4294967296);
+    ui->spinbox_y_max->setDecimals(3);
+    ui->spinbox_y_min->setRange(-4294967296,4294967296);
+    ui->spinbox_y_min->setDecimals(3);
+
+    ui->spinbox_range_adjustment->setRange(0,4294967296);
+
+
+
     updateSignals();
 
     if (ui->listWidget->count() <= 0){
@@ -84,6 +93,9 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
     connect(ui->pb_delete, &QPushButton::clicked, this, &changeGraphDialog::deleteElement);
     connect(ui->pb_add, &QPushButton::clicked, this, qOverload<>(&changeGraphDialog::addElement));
 
+    connect(this,&changeGraphDialog::newGraph, m_parent, &Plot::newGraph);
+    connect(this,&changeGraphDialog::changeGraphSettings, m_parent, &Plot::changeGraphSettings);
+
 }
 void changeGraphDialog::listWidgetRowChanged(int row){
 
@@ -95,7 +107,7 @@ void changeGraphDialog::listWidgetRowChanged(int row){
         m_settings_new[m_previous_row].linestyle = ui->combo_linestyle->currentData().toInt();
         m_settings_new[m_previous_row].scatterstyle = ui->combo_scatter_style->currentData().toInt();
         m_settings_new[m_previous_row].name =ui->txt_name->toPlainText();
-        m_settings_new[m_previous_row].signal = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
+        m_settings_new[m_previous_row].signal_yaxis = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
     }
     m_previous_row = row;
     for (int i=0; i<ui->combo_color->count(); i++){
@@ -120,7 +132,7 @@ void changeGraphDialog::listWidgetRowChanged(int row){
     }
 
     for (int i=0; i<ui->combo_signalname->count(); i++){
-        if (m_signals->getSignal(i).name.compare(m_settings_new[row].signal.name)==0){
+        if (m_signals->getSignal(i).name.compare(m_settings_new[row].signal_yaxis.name)==0){
             ui->combo_signalname->setCurrentIndex(i);
             break;
         }
@@ -199,17 +211,13 @@ void changeGraphDialog::apply(){
         m_settings_new[row].linestyle = ui->combo_linestyle->currentData().toInt();
         m_settings_new[row].scatterstyle = ui->combo_scatter_style->currentData().toInt();
         m_settings_new[row].name =ui->txt_name->toPlainText();
-        m_settings_new[row].signal = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
+        m_settings_new[row].signal_yaxis = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
         m_settings_new[row].signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->currentData().toInt());
     }
 
 
     for (int i=0; i<m_settings.length(); i++){
-        m_parent->graph(i)->setLineStyle(static_cast<QCPGraph::LineStyle>(m_settings_new[i].linestyle));
-        QCPScatterStyle::ScatterShape value = static_cast<QCPScatterStyle::ScatterShape>(m_settings_new[i].scatterstyle);
-        m_parent->graph(i)->setScatterStyle(value);
-        m_parent->graph(i)->setName(m_settings_new[i].name);
-        m_parent->graph(i)->setPen(QPen(QColor(m_settings_new[i].color)));
+        Q_EMIT changeGraphSettings(i,m_settings_new[i],m_settings[i],true);
     }
 
 
@@ -221,7 +229,7 @@ void changeGraphDialog::apply(){
         settings.scatterstyle = m_settings_new[i].scatterstyle;
         settings.color = m_settings_new[i].color;
         settings.name = m_settings_new[i].name;
-        settings.signal = m_settings_new[i].signal;
+        settings.signal_yaxis = m_settings_new[i].signal_yaxis;
         settings.signal_xaxis = m_settings_new[i].signal_xaxis;
 
         m_settings.append(settings);
@@ -239,10 +247,12 @@ void changeGraphDialog::deleteElement(){
     QListWidgetItem* item = ui->listWidget->takeItem(row); // removes the element from the list and returns a pointer to the item to delete
     m_previous_row = -1;
     delete item;
+    struct Signal xaxis = m_settings.at(row).signal_xaxis;
+    struct Signal yaxis = m_settings.at(row).signal_yaxis;
     m_settings.remove(row);
     m_settings_new.remove(row);
-    m_parent->removeData(row);
-    m_parent->removeGraph(m_parent->graph(row));
+
+    m_parent->deleteGraph(xaxis, yaxis,row);
 }
 
 void changeGraphDialog::addElement(){
@@ -282,27 +292,19 @@ void changeGraphDialog::addElement(struct SettingsGraph* settings_import=nullptr
             msgBox.exec();
             return;
         }
-        settings.signal = m_signals->getSignal(ui->combo_signalname->itemData(0).toInt());
+        settings.signal_yaxis = m_signals->getSignal(ui->combo_signalname->itemData(0).toInt());
         settings.signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->itemData(0).toInt());
     }else{
         settings.linestyle = settings_import->linestyle;
         settings.scatterstyle = settings_import->scatterstyle;
         settings.color = settings_import->color;
         settings.name = settings_import->name;
-        settings.signal = settings_import->signal;
-        settings.signal_xaxis = settings_import->signal;
+        settings.signal_yaxis = settings_import->signal_yaxis;
+        settings.signal_xaxis = settings_import->signal_yaxis;
     }
     ui->listWidget->addItem(settings.name);
-    m_parent->addGraph();
 
-    m_parent->graph(m_parent->graphCount()-1)->setLineStyle(static_cast<QCPGraph::LineStyle>(settings.linestyle));
-    QCPScatterStyle::ScatterShape value = static_cast<QCPScatterStyle::ScatterShape>(settings.scatterstyle);
-    m_parent->graph(m_parent->graphCount()-1)->setScatterStyle(value);
-    m_parent->graph(m_parent->graphCount()-1)->setName(settings.name);
-    m_parent->graph(m_parent->graphCount()-1)->setPen(QPen(QColor(settings.color)));
-
-
-    m_parent->appendYData();
+    Q_EMIT newGraph(settings);
 
     m_settings.append(settings);
     m_settings_new.append(settings);
@@ -331,4 +333,26 @@ void changeGraphDialog::updateSignals(){
 changeGraphDialog::~changeGraphDialog()
 {
     delete ui;
+}
+
+void changeGraphDialog::on_spinbox_y_min_valueChanged(double arg1)
+{
+    m_ymin = arg1;
+}
+
+void changeGraphDialog::on_spinbox_range_adjustment_valueChanged(double arg1)
+{
+    if(isRelative()){
+        m_automatic_range = arg1/100;
+    }
+}
+
+void changeGraphDialog::on_radioButton_toggled(bool checked)
+{
+    m_if_relative = checked;
+}
+
+void changeGraphDialog::on_spinbox_y_max_valueChanged(double arg1)
+{
+    m_ymax = arg1;
 }

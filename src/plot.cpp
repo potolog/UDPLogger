@@ -24,13 +24,12 @@
 #include "plotscontextmenu.h"
 #include "changegraphdialog.h"
 
-Plot::Plot(Plots* plots, QWidget* parent, int plot_buffersize,int udp_buffersize, int index, Signals *signal):
+Plot::Plot(Plots* plots, QWidget* parent, int index, Signals *signal):
     QCustomPlot(parent), m_index(index),m_parent(plots), m_signals(signal)
 {
 
     connect(this, &Plot::deletePlot2, plots, &Plots::deletePlot);
 
-    resizePlotBuffer(udp_buffersize, plot_buffersize);
     m_context_menu = new PlotsContextMenu();
     m_context_menu->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_context_menu, &PlotsContextMenu::customContextMenuRequested,this,&Plot::ShowContextMenu);
@@ -58,11 +57,6 @@ Plot::Plot(Plots* plots, QWidget* parent, int plot_buffersize,int udp_buffersize
     m_changegpraph_dialog = new changeGraphDialog(this,parent,signal);
     Qt::WindowFlags flags = m_changegpraph_dialog->windowFlags();
     m_changegpraph_dialog->setWindowFlags(flags | Qt::Tool);
-
-    m_ymin = 0;
-    m_ymax = 0;
-    m_xmin = 0;
-    m_xmax = 0;
     m_plot_buffer_index = 0;
 }
 
@@ -70,6 +64,36 @@ void Plot::ShowContextMenu(const QPoint& pos){
     qDebug() << "ShowContextMenu Position: " << pos;
 
     m_menu->exec(pos);
+}
+
+void Plot::deleteGraph(struct Signal xaxis, struct Signal yaxis, int index){
+    removeGraph(graph(index));
+
+    m_parent->removeGraph(xaxis, yaxis);
+}
+
+void Plot::newGraph(struct SettingsGraph settings){
+    addGraph();
+    struct SettingsGraph dummy;
+    changeGraphSettings(graphCount()-1, settings, dummy, false);
+    graph(graphCount()-1)->setAdaptiveSampling(true);
+}
+
+void Plot::changeGraphSettings(int index_graph, struct SettingsGraph new_settings, struct SettingsGraph old_settings, bool remove_signal){
+    graph(index_graph)->setLineStyle(static_cast<QCPGraph::LineStyle>(new_settings.linestyle));
+    QCPScatterStyle::ScatterShape value = static_cast<QCPScatterStyle::ScatterShape>(new_settings.scatterstyle);
+    graph(index_graph)->setScatterStyle(value);
+    graph(index_graph)->setName(new_settings.name);
+    graph(index_graph)->setPen(QPen(QColor(new_settings.color)));
+
+    QSharedPointer<QCPGraphDataContainer> data_puffer = m_parent->getBuffer(new_settings.signal_xaxis, new_settings.signal_yaxis);
+    // problem: durch das ersetzen der alten daten, wird der alte shared pointer gelöscht, aber der wurde ja bereits durch remove signals gelöscht
+    graph(index_graph)->setData(data_puffer);
+
+    if(remove_signal && new_settings.signal_xaxis.index != old_settings.signal_xaxis.index &&
+            new_settings.signal_yaxis.index != old_settings.signal_yaxis.index){
+        removeSignal(old_settings.signal_xaxis, old_settings.signal_yaxis);
+    }
 }
 
 bool Plot::ifNameExists(QString name){
@@ -104,113 +128,87 @@ void Plot::deletePlot(){
     deletePlot2(this->m_index);
 }
 
-void Plot::appendYData(){
-    m_y_data.resize(m_y_data.size()+1);
-    m_y_data[m_y_data.size()-1].resize(m_udp_buffersize);
-}
-
-void Plot::resizePlotBuffer(int udp_buffersize, int plot_buffersize){
-    m_plot_buffersize = plot_buffersize;
-    m_udp_buffersize = udp_buffersize;
-    for (int i=0; i<m_y_data.size(); i++){
-        m_y_data[i].resize(m_plot_buffersize);
-    }
-    m_x_data.resize(m_plot_buffersize);
-}
-
-void Plot::newData(unsigned long index){
+void Plot::newData(){
 // process new data
-    struct Signal signal;
 
-    for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
-        signal = m_changegpraph_dialog->getSettings(0).signal_xaxis;
-        if (j<0){
-            j= m_parent->getDataBufferSize()-j;
-        }
+    bool range_found;
+    if(graphCount() <= 0)
+        return;
 
-        if(m_changegpraph_dialog->getSignalCount()>0){
-            // first double is x Axis
-            double x_val = m_parent->getBufferData(j,signal.index);
-            m_x_data.append(x_val);
-            if(x_val > m_xmax){
-                m_xmax = x_val;
-            }
-
-            int size = m_x_data.size()- m_plot_buffersize;
-            for (int i= 0; i<size; i++){
-                m_x_data.removeFirst();
-            }
-            m_xmin = m_x_data[0];
-            m_xmax = m_x_data[m_x_data.size()-1];
-        }
+    double xmin, xmax;
+    QCPRange range = graph(0)->getKeyRange(range_found);
+    if(range_found){ // otherwise let old range
+        xmin = range.lower;
+        xmax = range.upper;
+        xAxis->setRange(xmin,xmax);
     }
 
 
+    // y Axis
+    double ymax, ymin;
+    bool ranges_found = false;
+    if(m_changegpraph_dialog->isAutomatic()){
+        for(unsigned int i=0; i<graphCount(); i++){
 
-
-    for(unsigned int i=0; i<graphCount(); i++){
-        signal = m_changegpraph_dialog->getSettings(i).signal;
-
-        for(int j=index-m_parent->getRedrawCounter()+1; j<=index; j++){
-
-            if (j<0){
-                j= m_parent->getDataBufferSize()-j;
-            }
-
-            //int index_temp = (index*m_parent->getBufferCount()+signal.index);
-            double y_val = m_parent->getBufferData(j, signal.index);
-            m_y_data[i].append(y_val);
-
-            int size=m_y_data[i].size()-m_plot_buffersize;
-            for(int j=0; j<size; j++){
-                m_y_data[i].removeFirst();
-            }
-
-            if(i==0){ // init limits
-                m_ymax = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-                m_ymin = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-            }else{ // adjust limits
-
-                double min = *std::min_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-                double max = *std::max_element(m_y_data[i].constBegin(), m_y_data[i].constEnd());
-
-                if(max > m_ymax){
-                    m_ymax = max;
+            range = graph(i)->getKeyRange(range_found);
+            if(range_found){
+                if(ranges_found==false){ // first range which was found
+                    ymin = range.lower;
+                    ymax = range.upper;
+                    continue;
                 }
-                if(min < m_ymin){
-                    m_ymin = min;
+                ranges_found = true;
+
+                if(ymax < range.upper){
+                    ymax = range.upper;
+                }
+                if(ymin > range.lower){
+                    ymin = range.lower;
+                }
+            }
+        }
+        if(ranges_found){
+            if(m_changegpraph_dialog->isRelative()){
+                double min_factor;
+                double max_factor;
+                if(ymin <0){
+                    min_factor = m_changegpraph_dialog->automaticRange();
+                }else if(ymin >0){
+                    min_factor = 1-m_changegpraph_dialog->automaticRange();
+                }else {
+                    min_factor = 1;
                 }
 
+                if(ymax > 0){
+                    max_factor = m_changegpraph_dialog->automaticRange();
+                }else if(ymax <0){
+                    max_factor = 1 - m_changegpraph_dialog->automaticRange();
+                }else{
+                    max_factor = 1;
+                }
+
+                yAxis->setRange(ymin*min_factor, ymax*max_factor);
+            }else{
+                if(ymin <0){
+                    ymin -= m_changegpraph_dialog->automaticRange();
+                }else { // ymin >=0
+                    ymin -= m_changegpraph_dialog->automaticRange();
+                }
+
+                if(ymax >= 0){
+                    ymax += m_changegpraph_dialog->automaticRange();
+                }else {// ymax <0
+                    ymax += m_changegpraph_dialog->automaticRange();
+                }
+
+                yAxis->setRange(ymin, ymax);
             }
         }
 
-        graph(i)->setData(m_x_data,m_y_data[i]);
-
-    }
-
-    double min_factor;
-    double max_factor;
-    if(m_ymin <0){
-        min_factor = 1; //(m_ymin -5)/m_ymin;
-    }else if(m_ymin >0){
-        min_factor = 1; //(m_ymin -5)/m_ymin;
-    }else {
-        min_factor = 0;//-5;
-    }
-
-    if(m_ymax > 0){
-        max_factor = 1; //(m_ymax+5)/m_ymax;
-    }else if(m_ymax <0){
-        max_factor = 1; //(m_ymax +5)/m_ymax;
     }else{
-        max_factor = 0; //5;
+        yAxis->setRange(m_changegpraph_dialog->yMin(),m_changegpraph_dialog->yMax());
     }
 
-    yAxis->setRange(m_ymin*min_factor, m_ymax*max_factor);
-
-
-
-    xAxis->setRange(m_xmin,m_xmax);
     replot();
     update();
 
@@ -228,10 +226,10 @@ void Plot::writeJSON(QJsonObject &object){
         graph["GraphName"] = settings.name;
 
         QJsonObject signal;
-        signal["Datatype"] = settings.signal.datatype;
-        signal["Index"] = settings.signal.index;
-        signal["Signalname"] = settings.signal.name;
-        signal["Offset"] = settings.signal.offset;
+        signal["Datatype"] = settings.signal_yaxis.datatype;
+        signal["Index"] = settings.signal_yaxis.index;
+        signal["Signalname"] = settings.signal_yaxis.name;
+        signal["Offset"] = settings.signal_yaxis.offset;
         graph["Signal"] = signal;
 
         graphs.append(graph);

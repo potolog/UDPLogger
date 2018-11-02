@@ -29,46 +29,82 @@ class QUdpSocket;
 class QMutex;
 class Plots;
 class QHostAddress;
+class PlotBuffers;
+class Signals;
+class TriggerWidget;
+class QTimer;
+class QThread;
+class ExportData;
+
+namespace UDP_CONSTANTS{
+    const int max_data = 400;
+}
+struct udp_message_puffer{
+    char puffer[UDP_CONSTANTS::max_data];
+};
 
 class UDP: public QObject
 {
     Q_OBJECT
 
 public:
-    UDP(Plots* parent, QMutex* mutex);
-    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, bool export_data, int use_data_count, QString filename);
+    UDP(Plots* parent, QMutex* mutex, PlotBuffers* data_buffers, Signals* signal, TriggerWidget* trigger);
+    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int redraw_count, bool export_data, int use_data_count, QString filename);
     bool init();
+    struct udp_message_puffer getValueIndexBefore(int index); // returns value "index" before actual m_udp_index
+    int64_t calculateTimedifference();
     ~UDP();
-public slots:
+public Q_SLOTS:
     void readData();
-    float* getFloatPointer(int position){return (float*)(&m_data.data()[position]);}
-    double* getDoublePointer(int position){return (double*)(&m_data.data()[position]);}
-    char* getCharPointer(int position){return &m_data.data()[position];}
-    int* getIntPointer(int position){return (int*)(&m_data.data()[position]);}
     void connectDataReady();
     void disconnectDataReady();
+    void timerTimeout();
+    void exportFinished();
 
-signals:
+Q_SIGNALS:
     void newData();
+    void triggerFinished();
 
 private:
     int m_actual_index;
     QUdpSocket *m_socket;
-    QVector<char> m_data;
-    QVector<char> m_data_temp;
-    const int m_max_data = 400;
     int m_use_data_count;
+    int m_udp_buffer_size;
 
     bool m_export_data;
     QFile* file;
     bool m_if_file_ready;
 
     QMutex* m_mutex;
+    QThread* m_writing_data_thread;
+
     unsigned long m_index_read; // index which data was read
     Plots* m_parent;
 
     bool m_ifread_data;
+    int m_data_buffer_size;
+    int m_redraw_count;
+    PlotBuffers *m_data_buffers;
+    Signals* m_signals;
+    int m_buffer_smaller_than_message;
+    TriggerWidget *m_triggerwidget;
+    double m_previous_value;
+    int m_trigger_index;
+    bool m_triggered;
 
+    QString m_filename;
+
+    // ring buffer
+    int m_udp_index;
+    QVector<struct udp_message_puffer> m_udp_buffer;
+
+    int64_t m_time_state;
+
+    wchar_t* m_python_program;
+
+    QTimer* m_timer;
+
+    ExportData* m_export;
 
 
 };
