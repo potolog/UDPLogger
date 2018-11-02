@@ -28,6 +28,11 @@ equals(flatpak,true){
     LIBS+= -L/app/lib -lxlnt
 }else: unix:!android: LIBS += -L/usr/lib -lxlnt
 
+
+# must be because python use signal slot keywords too. So in Qt "signals", "slots" and "emit" must be replaced by
+# "Q_SIGNALS", "Q_SLOTS" and "EMIT"
+CONFIG += no_keywords # http://doc.qt.io/qt-5/signalsandslots.html#using-qt-with-3rd-party-signals-and-slots
+
 CONFIG += c++11 \
         c++14
         debug
@@ -45,7 +50,11 @@ SOURCES += \
     src/plotscontextmenu.cpp \
     src/qcustomplot.cpp \
     src/settingsdialog.cpp \
-    src/signals.cpp
+    src/signals.cpp \
+    src/plotbuffer.cpp \
+    src/triggerwidget.cpp \
+    src/datafile.cpp \
+    src/exportdata.cpp
 
 HEADERS += \
     includes/changegraphdialog.h \
@@ -56,12 +65,17 @@ HEADERS += \
     includes/qcustomplot.h \
     includes/settingsdialog.h \
     includes/signals.h \
-    includes/udp.h
+    includes/udp.h \
+    includes/plotbuffer.h \
+    includes/triggerwidget.h \
+    includes/datafile.h \
+    includes/exportdata.h
 
 FORMS += \
     forms/changegraphdialog.ui \
     forms/mainwindow.ui \
-    forms/settingsdialog.ui
+    forms/settingsdialog.ui \
+    forms/triggerwidget.ui
 
 # Default rules for deployment.
 
