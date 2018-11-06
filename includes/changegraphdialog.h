@@ -71,8 +71,9 @@ private Q_SLOTS:
     void listWidgetRowChanged(int row);
     void on_spinbox_y_min_valueChanged(double arg1);
     void on_spinbox_range_adjustment_valueChanged(double arg1);
-    void on_radioButton_toggled(bool checked);
     void on_spinbox_y_max_valueChanged(double arg1);
+    void on_checkbox_if_automatic_range_toggled(bool checked);
+    void on_rb_relative_toggled(bool checked);
 
 private:
     Ui::changeGraphDialog *ui;

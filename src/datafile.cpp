@@ -5,11 +5,6 @@
 
 #include "signals.h"
 
-char m_temp_write[1000] = {0};
-int m_temp_write_counter = 0;
-char temp[1000] = {0};
-int temp_counter=0;
-
 DataFile::DataFile(QString path, QString version): m_path(path), m_version(version)
 {
 }
@@ -40,15 +35,9 @@ int DataFile::writeDataFile(QVector<QString>& names, QVector<QString>& units, QV
         for(int column = 0; column < data[0].length(); column++){
             double value = data[row][column];
             fwrite(&value,sizeof(double),1,pFile);
-            memcpy(m_temp_write+m_temp_write_counter,&value,sizeof (double));
-            m_temp_write_counter += sizeof (double);
-            fwrite(&seperator, sizeof(char),1,pFile);
-            memcpy(m_temp_write+m_temp_write_counter, &seperator, sizeof(char));
-            m_temp_write_counter += sizeof (char);
+            //fwrite(&seperator, sizeof(char),1,pFile);
         }
-        fwrite(&new_line,sizeof (char),1,pFile);
-        memcpy(m_temp_write+m_temp_write_counter, &new_line, sizeof(char));
-        m_temp_write_counter += sizeof (char);
+        //fwrite(&new_line,sizeof (char),1,pFile);
     }
     fclose (pFile);
     return 0;
@@ -101,7 +90,7 @@ int DataFile::readDataFile(){
     int result = -1;
 
 
-    int element_size = sizeof(double)+1;
+    int element_size = sizeof(double); //+1;
     int buffer_size = datafile::read_buffer_size_factor*m_signals.length()*element_size;
     char* buffer = (char*) std::malloc(buffer_size);
     if(buffer == nullptr){

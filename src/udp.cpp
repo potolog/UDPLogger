@@ -53,6 +53,7 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 
     m_triggered = false;
 
+
 }
 bool UDP::init(){
     return init(QHostAddress::AnyIPv4, 60000, 400,200,10, false,1, "");
@@ -69,6 +70,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size,int d
     m_udp_buffer.resize(udp_buffer_size);
     m_udp_index = 0;
     m_filename = filename;
+    m_redraw_counter = 0;
 
     m_buffer_smaller_than_message = 0;
 
@@ -92,8 +94,6 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size,int d
 
 void UDP::readData(){
 
-    //uint64_t difference = calculateTimedifference();
-
     if(m_actual_index >= m_use_data_count){
         m_actual_index = 0;
     }
@@ -102,10 +102,14 @@ void UDP::readData(){
         m_udp_index = 0;
     }
 
+    if(m_redraw_counter >= m_redraw_count){
+        m_redraw_counter = 0;
+    }
+
     struct udp_message_puffer puffer;
     qint64 size =  m_socket->readDatagram(puffer.puffer,UDP_CONSTANTS::max_data,nullptr, nullptr);
 
-    if(size > UDP_CONSTANTS::max_data && m_buffer_smaller_than_message ==0){
+    if(size > UDP_CONSTANTS::max_data && m_buffer_smaller_than_message ==0){ // only one time
         m_buffer_smaller_than_message = 1;
         QMessageBox::information(nullptr,tr("UDP message size greater than max data"),tr("The received UDP message size (")+QString::number(size)+tr(" Byte) is greater than the maximum allowed message size of ")+QString::number(UDP_CONSTANTS::max_data)+" Byte."+
                                  tr("This means, that not every signal can be plotted"));
@@ -117,7 +121,13 @@ void UDP::readData(){
         // Attention, m_m_use_data_count and m_redrawcount problem
         // Add data to data buffer, so the diagrams will be refreshed
         m_data_buffers->addData(puffer.puffer,UDP_CONSTANTS::max_data);
+
+        if(m_redraw_counter == 0){
+            Q_EMIT dataChanged();
+        }
+        m_redraw_counter++;
     }
+
     m_mutex->unlock();
 
     if(m_triggerwidget->isTriggerEnabled()){

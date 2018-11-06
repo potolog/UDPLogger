@@ -13,6 +13,14 @@ TriggerWidget::TriggerWidget(Signals *signal, QWidget *parent) :
     }
 
     ui->cb_triggertype->setCurrentIndex(0);
+    m_signal_index = 0;
+    m_t_after_trigger =0;
+    m_t_before_trigger = 0;
+    m_trigger_type = TriggerType::RISING_EDGE;
+    m_automatic_restart = false;
+    m_trigger_level = 0;
+    m_trigger_enabled = false;
+    ui->checkbox_enable_trigger->setEnabled(false);
 
 }
 
@@ -27,6 +35,9 @@ void TriggerWidget::updateSignals(){
     for (int i=0; i< m_signals->getSignalCount(); i++){
         signal_temp = m_signals->getSignal(i);
         ui->cb_signals->addItem(signal_temp.name,i);
+    }
+    if(m_signals->getSignalCount()>0){
+        ui->checkbox_enable_trigger->setEnabled(true);
     }
 }
 

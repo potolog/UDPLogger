@@ -27,8 +27,6 @@
 #include <QDockWidget>
 #include "triggerwidget.h"
 
-#include <Python.h>
-
 using namespace std;
 
 

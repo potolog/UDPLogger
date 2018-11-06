@@ -77,8 +77,6 @@ void Plots::deletePlot(int index){
     item = m_layout->takeAt( index );
     qDebug() << "Item -> widget(): " <<item->widget();
     if(item->widget() == m_plots.at(index)){
-        returnvalue = disconnect(m_data_buffers, &PlotBuffers::dataChanged, m_plots.at(index), &Plot::newData);
-        returnvalue = disconnect(m_signals, &Signals::signalsChanged, m_plots.at(index), &Plot::signalsChanged);
         qDebug() << "Deleting Object";
         item->widget()->deleteLater();
         m_plots.remove(index);
@@ -243,7 +241,7 @@ Plot* Plots::createNewPlot()
     connect(plot, &Plot::removeSignal, m_data_buffers, &PlotBuffers::removeSignal);
     m_plots.append(plot);
     m_layout->addWidget(plot);
-    connect(m_data_buffers, &PlotBuffers::dataChanged, plot, &Plot::newData);
+    connect(m_udp, &UDP::dataChanged, plot, &Plot::newData);
     connect(m_signals, &Signals::signalsChanged, plot, &Plot::signalsChanged);
     return plot;
 }

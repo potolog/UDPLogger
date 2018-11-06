@@ -58,6 +58,7 @@ Plot::Plot(Plots* plots, QWidget* parent, int index, Signals *signal):
     Qt::WindowFlags flags = m_changegpraph_dialog->windowFlags();
     m_changegpraph_dialog->setWindowFlags(flags | Qt::Tool);
     m_plot_buffer_index = 0;
+
 }
 
 void Plot::ShowContextMenu(const QPoint& pos){
@@ -85,7 +86,6 @@ void Plot::changeGraphSettings(int index_graph, struct SettingsGraph new_setting
     graph(index_graph)->setScatterStyle(value);
     graph(index_graph)->setName(new_settings.name);
     graph(index_graph)->setPen(QPen(QColor(new_settings.color)));
-
     QSharedPointer<QCPGraphDataContainer> data_puffer = m_parent->getBuffer(new_settings.signal_xaxis, new_settings.signal_yaxis);
     // problem: durch das ersetzen der alten daten, wird der alte shared pointer gelöscht, aber der wurde ja bereits durch remove signals gelöscht
     graph(index_graph)->setData(data_puffer);
@@ -150,14 +150,14 @@ void Plot::newData(){
     if(m_changegpraph_dialog->isAutomatic()){
         for(unsigned int i=0; i<graphCount(); i++){
 
-            range = graph(i)->getKeyRange(range_found);
+            range = graph(i)->getValueRange(range_found);
             if(range_found){
                 if(ranges_found==false){ // first range which was found
                     ymin = range.lower;
                     ymax = range.upper;
+                    ranges_found = true;
                     continue;
                 }
-                ranges_found = true;
 
                 if(ymax < range.upper){
                     ymax = range.upper;

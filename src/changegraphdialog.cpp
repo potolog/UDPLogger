@@ -96,6 +96,19 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
     connect(this,&changeGraphDialog::newGraph, m_parent, &Plot::newGraph);
     connect(this,&changeGraphDialog::changeGraphSettings, m_parent, &Plot::changeGraphSettings);
 
+    ui->checkbox_if_automatic_range->setChecked(false);
+    m_if_automatic_range = false;
+    ui->spinbox_range_adjustment->setValue(100);
+    m_automatic_range = 100/100;
+    ui->spinbox_y_max->setValue(0);
+    m_ymax = 0;
+    ui->spinbox_y_min->setValue(0);
+    m_ymin =0;
+    ui->rb_relative->setChecked(true);
+    m_if_relative = true;
+
+
+
 }
 void changeGraphDialog::listWidgetRowChanged(int row){
 
@@ -342,17 +355,27 @@ void changeGraphDialog::on_spinbox_y_min_valueChanged(double arg1)
 
 void changeGraphDialog::on_spinbox_range_adjustment_valueChanged(double arg1)
 {
+    m_automatic_range = arg1;
     if(isRelative()){
-        m_automatic_range = arg1/100;
+        m_automatic_range /= 100;
     }
-}
-
-void changeGraphDialog::on_radioButton_toggled(bool checked)
-{
-    m_if_relative = checked;
 }
 
 void changeGraphDialog::on_spinbox_y_max_valueChanged(double arg1)
 {
     m_ymax = arg1;
+}
+
+void changeGraphDialog::on_checkbox_if_automatic_range_toggled(bool checked)
+{
+    m_if_automatic_range = checked;
+}
+
+void changeGraphDialog::on_rb_relative_toggled(bool checked)
+{
+    m_if_relative = checked;
+
+    if(!checked){
+        m_automatic_range*=100;
+    }
 }

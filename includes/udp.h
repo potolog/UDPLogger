@@ -64,6 +64,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void newData();
     void triggerFinished();
+    void dataChanged();
 
 private:
     int m_actual_index;
@@ -91,6 +92,8 @@ private:
     double m_previous_value;
     int m_trigger_index;
     bool m_triggered;
+
+    int m_redraw_counter;
 
     QString m_filename;
 
