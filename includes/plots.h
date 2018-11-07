@@ -53,20 +53,22 @@ public:
     ~Plots();
     void removeGraph(struct Signal xaxis, struct Signal yaxis);
     QSharedPointer<QCPGraphDataContainer> getBuffer(struct Signal xaxis, struct Signal yaxis);
-public Q_SLOTS:
+    QWidget* getParent(){return m_parent;}
+public slots:
     void deletePlot(int index);
     void exportSettings();
     void importSettings();
     void settings();
     void startUDP();
     void stopUDP();
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename, QString relative_header_path);
-Q_SIGNALS:
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int redraw_count, int use_data_count, QString export_path, QString relative_header_path);
+    void showInfoMessageBox(QString title, QString text);
+signals:
     void startUDPReadData();
     void resizePlotBuffer(int udp_buffersize, int plot_buffersize);
     void connectToReadyRead();
     void disconnectToReadyRead();
-    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size,int data_size, int redraw_count, bool export_data,int m_use_data_count, QString filename);
+    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size,int data_size, int redraw_count, int m_use_data_count, QString export_path, QString project_name);
     void changeRelativeHeaderPath(QString relative_header_path);
     void dataBufferSizeChanged(int data_buffer_size);
 private:
@@ -81,13 +83,12 @@ private:
     int m_port;
     int m_udp_buffersize;
     int m_plot_buffersize;
-    bool m_export_data;
     QString m_export_filename;
     int m_redraw_count;
     unsigned long m_index_new_data; // used with m_redraw_count
     int m_use_data_count;
 
-    QString m_program_version;
+    QString m_program_version = "2.0";
     QString m_project_name;
     bool m_ifudpLogging;
     SettingsDialog* m_settings_dialog;

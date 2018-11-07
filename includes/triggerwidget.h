@@ -33,11 +33,11 @@ public:
     double getTimeAfterTrigger();
     double getTimeBeforeTrigger();
     void disableTrigger();
-public Q_SLOTS:
+public slots:
     void updateSignals();
     void triggered();
 
-private Q_SLOTS:
+private slots:
     void on_spinbox_trigger_level_valueChanged(double arg1);
 
     void on_cb_triggertype_activated(int index);

@@ -73,14 +73,14 @@ void Plot::deleteGraph(struct Signal xaxis, struct Signal yaxis, int index){
     m_parent->removeGraph(xaxis, yaxis);
 }
 
-void Plot::newGraph(struct SettingsGraph settings){
+void Plot::newGraph(struct SignalSettings settings){
     addGraph();
-    struct SettingsGraph dummy;
+    struct SignalSettings dummy;
     changeGraphSettings(graphCount()-1, settings, dummy, false);
     graph(graphCount()-1)->setAdaptiveSampling(true);
 }
 
-void Plot::changeGraphSettings(int index_graph, struct SettingsGraph new_settings, struct SettingsGraph old_settings, bool remove_signal){
+void Plot::changeGraphSettings(int index_graph, struct SignalSettings new_settings, struct SignalSettings old_settings, bool remove_signal){
     graph(index_graph)->setLineStyle(static_cast<QCPGraph::LineStyle>(new_settings.linestyle));
     QCPScatterStyle::ScatterShape value = static_cast<QCPScatterStyle::ScatterShape>(new_settings.scatterstyle);
     graph(index_graph)->setScatterStyle(value);
@@ -120,7 +120,7 @@ void Plot::clearPlot(){
     clearGraphs();
 }
 
-void Plot::addGraphToPlot(struct SettingsGraph* settings){
+void Plot::addGraphToPlot(struct SignalSettings* settings){
     m_changegpraph_dialog->addElement(settings);
 }
 
@@ -215,27 +215,89 @@ void Plot::newData(){
 }
 
 void Plot::writeJSON(QJsonObject &object){
+
+    struct Settings settings = m_changegpraph_dialog->getSettings();
+    object["ymin"] = settings.ymin;
+    object["ymax"] = settings.ymax;
+    object["ifrelative_range"] = settings.ifrelative_ranging;
+    object["ifautomatic_range"] = settings.ifautomatic_range;
+    object["automatic_value"] = settings.automatic_value;
     QJsonArray graphs;
     for(int i=0; i<graphCount(); i++){
+        struct SignalSettings signalsettings = settings.signal_settings[i];
         QJsonObject graph;
-        struct SettingsGraph settings = m_changegpraph_dialog->getSettings(i);
-        graph["Color"] = QString(settings.color.name());
-        qDebug() << "QColor to string" <<QString(settings.color.name());
-        graph["LineStyle"] = settings.linestyle;
-        graph["ScatterStyle"] = settings.scatterstyle;
-        graph["GraphName"] = settings.name;
 
+        graph["Color"] = QString(signalsettings.color.name());
+        qDebug() << "QColor to string" <<QString(signalsettings.color.name());
+        graph["LineStyle"] = signalsettings.linestyle;
+        graph["ScatterStyle"] = signalsettings.scatterstyle;
+        graph["GraphName"] = signalsettings.name;
         QJsonObject signal;
-        signal["Datatype"] = settings.signal_yaxis.datatype;
-        signal["Index"] = settings.signal_yaxis.index;
-        signal["Signalname"] = settings.signal_yaxis.name;
-        signal["Offset"] = settings.signal_yaxis.offset;
-        graph["Signal"] = signal;
+        signal["Datatype"] = signalsettings.signal_yaxis.datatype;
+        signal["Index"] = signalsettings.signal_yaxis.index;
+        signal["Signalname"] = signalsettings.signal_yaxis.name;
+        signal["Offset"] = signalsettings.signal_yaxis.offset;
+        graph["Signal yAxis"] = signal;
+
+        signal["Datatype"] = signalsettings.signal_xaxis.datatype;
+        signal["Index"] = signalsettings.signal_xaxis.index;
+        signal["Signalname"] = signalsettings.signal_xaxis.name;
+        signal["Offset"] = signalsettings.signal_xaxis.offset;
+        graph["Signal xAxis"] = signal;
 
         graphs.append(graph);
     }
     if (graphs.count() > 0){
         object["Graphs"] = graphs;
+    }
+}
+
+void Plot::importSettings(QJsonObject& plot_settings){
+    if(!plot_settings.contains("Graphs")){
+        qDebug() << "No plot settings found";
+        return;
+    }
+    struct Settings settings;
+
+    settings.ymin = plot_settings["ymin"].toDouble();
+    settings.ymax = plot_settings["ymax"].toDouble();
+    settings.automatic_value = plot_settings["automatic_value"].toDouble();
+    settings.ifautomatic_range = plot_settings["ifautomatic_range"].toBool();
+    settings.ifrelative_ranging = plot_settings["ifrelative_range"].toBool();
+
+
+    QJsonArray graphs = plot_settings["Graphs"].toArray();
+    for(int j=0; j<graphs.count(); j++){
+
+        QJsonObject graph = graphs[j].toObject();
+
+        struct SignalSettings signal_settings;
+        signal_settings.name = graph["GraphName"].toString();
+        signal_settings.color = QColor(graph["Color"].toString());
+        signal_settings.scatterstyle = graph["ScatterStyle"].toInt();
+        signal_settings.linestyle = graph["LineStyle"].toInt();
+
+        struct Signal signal;
+        QJsonObject signalsettings = graph["Signal yAxis"].toObject();
+
+        signal.datatype = signalsettings["Datatype"].toString();
+        signal.index = signalsettings["Index"].toInt();
+        signal.offset = signalsettings["Offset"].toInt();
+        signal.name = signalsettings["Signalname"].toString();
+        signal_settings.signal_yaxis = signal;
+
+        signalsettings = graph["Signal xAxis"].toObject();
+        signal.datatype = signalsettings["Datatype"].toString();
+        signal.index = signalsettings["Index"].toInt();
+        signal.offset = signalsettings["Offset"].toInt();
+        signal.name = signalsettings["Signalname"].toString();
+        signal_settings.signal_xaxis = signal;
+
+        settings.signal_settings.append(signal_settings);
+
+        m_changegpraph_dialog->setSettings(settings);
+
+
     }
 }
 

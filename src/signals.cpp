@@ -61,7 +61,7 @@ void Signals::importJSonFile(QString filename){
         }
         setSignals(&signal_vector);
 
-        Q_EMIT signalsChanged();
+        emit signalsChanged();
     }
 
 
@@ -137,7 +137,7 @@ int Signals::importXLSX(QString filename){
 
     m_signals.clear();
     m_signals = new_signals;
-    Q_EMIT signalsChanged();
+    emit signalsChanged();
     return 0;
 }
 

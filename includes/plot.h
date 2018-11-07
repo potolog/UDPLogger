@@ -33,23 +33,24 @@ class Plot : public QCustomPlot{
 public:
     Plot(Plots* plots, QWidget* parent, int index, Signals* signal);
     void mousePressEvent(QMouseEvent *ev);
-    void addGraphToPlot(struct SettingsGraph* settings);
+    void addGraphToPlot(struct SignalSettings* settings);
     bool ifNameExists(QString name);
     void deleteGraph(struct Signal xaxis,struct Signal yaxis, int index);
     void writeJSON(QJsonObject &object);
+    void importSettings(QJsonObject& object);
 
     ~Plot();
-private Q_SLOTS:
+private slots:
     void ShowContextMenu(const QPoint& pos);
     void deletePlot();
     void clearPlot();
     void changeGraphStyle();
-public Q_SLOTS:
+public slots:
     void newData();
     void signalsChanged();
-    void newGraph(struct SettingsGraph settings);
-    void changeGraphSettings(int index_graph, struct SettingsGraph new_settings, struct SettingsGraph old_settings, bool remove_signal);
-Q_SIGNALS:
+    void newGraph(struct SignalSettings settings);
+    void changeGraphSettings(int index_graph, struct SignalSettings new_settings, struct SignalSettings old_settings, bool remove_signal);
+signals:
     void deletePlot2(int index);
     void removeSignal(struct Signal xaxis,struct Signal yaxis);
 

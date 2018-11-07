@@ -43,7 +43,7 @@ public:
     void plot();
     void writeSettings();
     void readSettings();
- public Q_SLOTS:
+ public slots:
     void disableStartUDP();
     void disableStopUDP();
     void changeDockVisibility(bool checked);

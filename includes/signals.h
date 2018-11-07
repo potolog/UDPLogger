@@ -44,7 +44,7 @@ public:
     Signals();
     int getSignalCount(){return m_signals.length();}
     struct Signal getSignal(int index){return m_signals[index];}
-    void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals;}
+    void setSignals(QVector<struct Signal>* imported_signals){m_signals = *imported_signals; emit signalsChanged();}
     void importJSonFile(QString filename);
     int importXLSX(QString filename);
     bool isStruct(QString variablename);
@@ -53,12 +53,12 @@ private:
     void getInputArguments(QVector<struct input_arguments>& arguments);
     void createMemcpyStrings(QVector<QString> &memcpy_strings);
 
-public Q_SLOTS:
+public slots:
     void importSignals();
     void exportUDPFunction();
     void changeRelativeHeaderPath(QString relative_header_path);
 
-Q_SIGNALS:
+signals:
     void signalsChanged();
 
 private:

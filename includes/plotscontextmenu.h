@@ -28,9 +28,9 @@ class PlotsContextMenu : public QWidget
 public:
     explicit PlotsContextMenu(QWidget *parent = nullptr);
 
-Q_SIGNALS:
+signals:
 
-public Q_SLOTS:
+public slots:
 };
 
 #endif // PLOTSCONTEXTMENU_H

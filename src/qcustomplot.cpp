@@ -1556,7 +1556,7 @@ bool QCPLayerable::moveToLayer(QCPLayer *layer, bool prepend)
   if (mLayer)
     mLayer->addChild(this, prepend);
   if (mLayer != oldLayer)
-    Q_EMIT layerChanged(mLayer);
+    emit layerChanged(mLayer);
   return true;
 }
 
@@ -2878,7 +2878,7 @@ void QCPSelectionRect::cancel()
   if (mActive)
   {
     mActive = false;
-    Q_EMIT canceled(mRect, 0);
+    emit canceled(mRect, 0);
   }
 }
 
@@ -2892,7 +2892,7 @@ void QCPSelectionRect::startSelection(QMouseEvent *event)
 {
   mActive = true;
   mRect = QRect(event->pos(), event->pos());
-  Q_EMIT started(event);
+  emit started(event);
 }
 
 /*! \internal
@@ -2904,7 +2904,7 @@ void QCPSelectionRect::startSelection(QMouseEvent *event)
 void QCPSelectionRect::moveSelection(QMouseEvent *event)
 {
   mRect.setBottomRight(event->pos());
-  Q_EMIT changed(mRect, event);
+  emit changed(mRect, event);
   layer()->replot();
 }
 
@@ -2918,7 +2918,7 @@ void QCPSelectionRect::endSelection(QMouseEvent *event)
 {
   mRect.setBottomRight(event->pos());
   mActive = false;
-  Q_EMIT accepted(mRect, event);
+  emit accepted(mRect, event);
 }
 
 /*! \internal
@@ -2932,7 +2932,7 @@ void QCPSelectionRect::keyPressEvent(QKeyEvent *event)
   if (event->key() == Qt::Key_Escape && mActive)
   {
     mActive = false;
-    Q_EMIT canceled(mRect, event);
+    emit canceled(mRect, event);
   }
 }
 
@@ -7679,7 +7679,7 @@ void QCPAxis::setScaleType(QCPAxis::ScaleType type)
     if (mScaleType == stLogarithmic)
       setRange(mRange.sanitizedForLogScale());
     mCachedMarginValid = false;
-    Q_EMIT scaleTypeChanged(mScaleType);
+    emit scaleTypeChanged(mScaleType);
   }
 }
 
@@ -7705,8 +7705,8 @@ void QCPAxis::setRange(const QCPRange &range)
   {
     mRange = range.sanitizedForLinScale();
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -7724,7 +7724,7 @@ void QCPAxis::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    Q_EMIT selectableChanged(mSelectableParts);
+    emit selectableChanged(mSelectableParts);
   }
 }
 
@@ -7748,7 +7748,7 @@ void QCPAxis::setSelectedParts(const SelectableParts &selected)
   if (mSelectedParts != selected)
   {
     mSelectedParts = selected;
-    Q_EMIT selectionChanged(mSelectedParts);
+    emit selectionChanged(mSelectedParts);
   }
 }
 
@@ -7777,8 +7777,8 @@ void QCPAxis::setRange(double lower, double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -7820,8 +7820,8 @@ void QCPAxis::setRangeLower(double lower)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -7842,8 +7842,8 @@ void QCPAxis::setRangeUpper(double upper)
   {
     mRange = mRange.sanitizedForLinScale();
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -8424,8 +8424,8 @@ void QCPAxis::moveRange(double diff)
     mRange.lower *= diff;
     mRange.upper *= diff;
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -8473,8 +8473,8 @@ void QCPAxis::scaleRange(double factor, double center)
     } else
       qDebug() << Q_FUNC_INFO << "Center of scaling operation doesn't lie in same logarithmic sign domain as range:" << center;
   }
-  Q_EMIT rangeChanged(mRange);
-  Q_EMIT rangeChanged(mRange, oldRange);
+  emit rangeChanged(mRange);
+  emit rangeChanged(mRange, oldRange);
 }
 
 /*!
@@ -10843,8 +10843,8 @@ void QCPAbstractPlottable::setSelection(QCPDataSelection selection)
   if (mSelection != selection)
   {
     mSelection = selection;
-    Q_EMIT selectionChanged(selected());
-    Q_EMIT selectionChanged(mSelection);
+    emit selectionChanged(selected());
+    emit selectionChanged(mSelection);
   }
 }
 
@@ -10891,11 +10891,11 @@ void QCPAbstractPlottable::setSelectable(QCP::SelectionType selectable)
     mSelectable = selectable;
     QCPDataSelection oldSelection = mSelection;
     mSelection.enforceType(mSelectable);
-    Q_EMIT selectableChanged(mSelectable);
+    emit selectableChanged(mSelectable);
     if (mSelection != oldSelection)
     {
-      Q_EMIT selectionChanged(selected());
-      Q_EMIT selectionChanged(mSelection);
+      emit selectionChanged(selected());
+      emit selectionChanged(mSelection);
     }
   }
 }
@@ -12279,7 +12279,7 @@ void QCPAbstractItem::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    Q_EMIT selectableChanged(mSelectable);
+    emit selectableChanged(mSelectable);
   }
 }
 
@@ -12302,7 +12302,7 @@ void QCPAbstractItem::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    Q_EMIT selectionChanged(mSelected);
+    emit selectionChanged(mSelected);
   }
 }
 
@@ -14436,7 +14436,7 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
     return;
   mReplotting = true;
   mReplotQueued = false;
-  Q_EMIT beforeReplot();
+  emit beforeReplot();
   
   updateLayout();
   // draw all layered objects (grid, axes, plottables, items, legend,...) into their buffers:
@@ -14451,7 +14451,7 @@ void QCustomPlot::replot(QCustomPlot::RefreshPriority refreshPriority)
   else
     update();
   
-  Q_EMIT afterReplot();
+  emit afterReplot();
   mReplotting = false;
 }
 
@@ -14781,7 +14781,7 @@ void QCustomPlot::resizeEvent(QResizeEvent *event)
 */
 void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
 {
-  Q_EMIT mouseDoubleClick(event);
+  emit mouseDoubleClick(event);
   mMouseHasMoved = false;
   mMousePressPos = event->pos();
   
@@ -14808,15 +14808,15 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
       int dataIndex = 0;
       if (!details.first().value<QCPDataSelection>().isEmpty())
         dataIndex = details.first().value<QCPDataSelection>().dataRange().begin();
-      Q_EMIT plottableDoubleClick(ap, dataIndex, event);
+      emit plottableDoubleClick(ap, dataIndex, event);
     } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(candidates.first()))
-      Q_EMIT axisDoubleClick(ax, details.first().value<QCPAxis::SelectablePart>(), event);
+      emit axisDoubleClick(ax, details.first().value<QCPAxis::SelectablePart>(), event);
     else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(candidates.first()))
-      Q_EMIT itemDoubleClick(ai, event);
+      emit itemDoubleClick(ai, event);
     else if (QCPLegend *lg = qobject_cast<QCPLegend*>(candidates.first()))
-      Q_EMIT legendDoubleClick(lg, 0, event);
+      emit legendDoubleClick(lg, 0, event);
     else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(candidates.first()))
-      Q_EMIT legendDoubleClick(li->parentLegend(), li, event);
+      emit legendDoubleClick(li->parentLegend(), li, event);
   }
   
   event->accept(); // in case QCPLayerable reimplementation manipulates event accepted state. In QWidget event system, QCustomPlot wants to accept the event.
@@ -14833,7 +14833,7 @@ void QCustomPlot::mouseDoubleClickEvent(QMouseEvent *event)
 */
 void QCustomPlot::mousePressEvent(QMouseEvent *event)
 {
-  Q_EMIT mousePress(event);
+  emit mousePress(event);
   // save some state to tell in releaseEvent whether it was a click:
   mMouseHasMoved = false;
   mMousePressPos = event->pos();
@@ -14883,7 +14883,7 @@ void QCustomPlot::mousePressEvent(QMouseEvent *event)
 */
 void QCustomPlot::mouseMoveEvent(QMouseEvent *event)
 {
-  Q_EMIT mouseMove(event);
+  emit mouseMove(event);
   
   if (!mMouseHasMoved && (mMousePressPos-event->pos()).manhattanLength() > 3)
     mMouseHasMoved = true; // moved too far from mouse press position, don't handle as click on mouse release
@@ -14912,7 +14912,7 @@ void QCustomPlot::mouseMoveEvent(QMouseEvent *event)
 */
 void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
 {
-  Q_EMIT mouseRelease(event);
+  emit mouseRelease(event);
   
   if (!mMouseHasMoved) // mouse hasn't moved (much) between press and release, so handle as click
   {
@@ -14927,15 +14927,15 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
       int dataIndex = 0;
       if (!mMouseSignalLayerableDetails.value<QCPDataSelection>().isEmpty())
         dataIndex = mMouseSignalLayerableDetails.value<QCPDataSelection>().dataRange().begin();
-      Q_EMIT plottableClick(ap, dataIndex, event);
+      emit plottableClick(ap, dataIndex, event);
     } else if (QCPAxis *ax = qobject_cast<QCPAxis*>(mMouseSignalLayerable))
-      Q_EMIT axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
+      emit axisClick(ax, mMouseSignalLayerableDetails.value<QCPAxis::SelectablePart>(), event);
     else if (QCPAbstractItem *ai = qobject_cast<QCPAbstractItem*>(mMouseSignalLayerable))
-      Q_EMIT itemClick(ai, event);
+      emit itemClick(ai, event);
     else if (QCPLegend *lg = qobject_cast<QCPLegend*>(mMouseSignalLayerable))
-      Q_EMIT legendClick(lg, 0, event);
+      emit legendClick(lg, 0, event);
     else if (QCPAbstractLegendItem *li = qobject_cast<QCPAbstractLegendItem*>(mMouseSignalLayerable))
-      Q_EMIT legendClick(li->parentLegend(), li, event);
+      emit legendClick(li->parentLegend(), li, event);
     mMouseSignalLayerable = 0;
   }
   
@@ -14966,7 +14966,7 @@ void QCustomPlot::mouseReleaseEvent(QMouseEvent *event)
 */
 void QCustomPlot::wheelEvent(QWheelEvent *event)
 {
-  Q_EMIT mouseWheel(event);
+  emit mouseWheel(event);
   // forward event to layerable under cursor:
   QList<QCPLayerable*> candidates = layerableListAt(event->pos(), false);
   for (int i=0; i<candidates.size(); ++i)
@@ -15364,7 +15364,7 @@ void QCustomPlot::processRectSelection(QRect rect, QMouseEvent *event)
   
   if (selectionStateChanged)
   {
-    Q_EMIT selectionChangedByUser();
+    emit selectionChangedByUser();
     replot(rpQueuedReplot);
   } else if (mSelectionRect)
     mSelectionRect->layer()->replot();
@@ -15441,7 +15441,7 @@ void QCustomPlot::processPointSelection(QMouseEvent *event)
   }
   if (selectionStateChanged)
   {
-    Q_EMIT selectionChangedByUser();
+    emit selectionChangedByUser();
     replot(rpQueuedReplot);
   }
 }
@@ -18069,7 +18069,7 @@ void QCPAbstractLegendItem::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    Q_EMIT selectableChanged(mSelectable);
+    emit selectableChanged(mSelectable);
   }
 }
 
@@ -18086,7 +18086,7 @@ void QCPAbstractLegendItem::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    Q_EMIT selectionChanged(mSelected);
+    emit selectionChanged(mSelected);
   }
 }
 
@@ -18483,7 +18483,7 @@ void QCPLegend::setSelectableParts(const SelectableParts &selectable)
   if (mSelectableParts != selectable)
   {
     mSelectableParts = selectable;
-    Q_EMIT selectableChanged(mSelectableParts);
+    emit selectableChanged(mSelectableParts);
   }
 }
 
@@ -18529,7 +18529,7 @@ void QCPLegend::setSelectedParts(const SelectableParts &selected)
       }
     }
     mSelectedParts = newSelected;
-    Q_EMIT selectionChanged(mSelectedParts);
+    emit selectionChanged(mSelectedParts);
   }
 }
 
@@ -19119,7 +19119,7 @@ void QCPTextElement::setSelectable(bool selectable)
   if (mSelectable != selectable)
   {
     mSelectable = selectable;
-    Q_EMIT selectableChanged(mSelectable);
+    emit selectableChanged(mSelectable);
   }
 }
 
@@ -19135,7 +19135,7 @@ void QCPTextElement::setSelected(bool selected)
   if (mSelected != selected)
   {
     mSelected = selected;
-    Q_EMIT selectionChanged(mSelected);
+    emit selectionChanged(mSelected);
   }
 }
 
@@ -19242,7 +19242,7 @@ void QCPTextElement::mousePressEvent(QMouseEvent *event, const QVariant &details
 void QCPTextElement::mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos)
 {
   if ((QPointF(event->pos())-startPos).manhattanLength() <= 3)
-    Q_EMIT clicked(event);
+    emit clicked(event);
 }
 
 /*!
@@ -19253,7 +19253,7 @@ void QCPTextElement::mouseReleaseEvent(QMouseEvent *event, const QPointF &startP
 void QCPTextElement::mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details)
 {
   Q_UNUSED(details)
-  Q_EMIT doubleClicked(event);
+  emit doubleClicked(event);
 }
 
 /*! \internal
@@ -19493,7 +19493,7 @@ void QCPColorScale::setDataRange(const QCPRange &dataRange)
     mDataRange = dataRange;
     if (mColorAxis)
       mColorAxis.data()->setRange(mDataRange);
-    Q_EMIT dataRangeChanged(mDataRange);
+    emit dataRangeChanged(mDataRange);
   }
 }
 
@@ -19525,7 +19525,7 @@ void QCPColorScale::setDataScaleType(QCPAxis::ScaleType scaleType)
       mColorAxis.data()->setScaleType(mDataScaleType);
     if (mDataScaleType == QCPAxis::stLogarithmic)
       setDataRange(mDataRange.sanitizedForLogScale());
-    Q_EMIT dataScaleTypeChanged(mDataScaleType);
+    emit dataScaleTypeChanged(mDataScaleType);
   }
 }
 
@@ -19543,7 +19543,7 @@ void QCPColorScale::setGradient(const QCPColorGradient &gradient)
     mGradient = gradient;
     if (mAxisRect)
       mAxisRect.data()->mGradientImageInvalidated = true;
-    Q_EMIT gradientChanged(mGradient);
+    emit gradientChanged(mGradient);
   }
 }
 
@@ -25707,7 +25707,7 @@ void QCPColorMap::setDataRange(const QCPRange &dataRange)
     else
       mDataRange = dataRange.sanitizedForLinScale();
     mMapImageInvalidated = true;
-    Q_EMIT dataRangeChanged(mDataRange);
+    emit dataRangeChanged(mDataRange);
   }
 }
 
@@ -25722,7 +25722,7 @@ void QCPColorMap::setDataScaleType(QCPAxis::ScaleType scaleType)
   {
     mDataScaleType = scaleType;
     mMapImageInvalidated = true;
-    Q_EMIT dataScaleTypeChanged(mDataScaleType);
+    emit dataScaleTypeChanged(mDataScaleType);
     if (mDataScaleType == QCPAxis::stLogarithmic)
       setDataRange(mDataRange.sanitizedForLogScale());
   }
@@ -25745,7 +25745,7 @@ void QCPColorMap::setGradient(const QCPColorGradient &gradient)
   {
     mGradient = gradient;
     mMapImageInvalidated = true;
-    Q_EMIT gradientChanged(mGradient);
+    emit gradientChanged(mGradient);
   }
 }
 

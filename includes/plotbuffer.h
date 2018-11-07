@@ -38,10 +38,10 @@ public:
     static inline char* getCharPointer(int position,char* data){return &data[position];}
     static inline int* getIntPointer(int position,char* data){return (int*)(&data[position]);}
     static double getValue(char* data, int length, struct Signal signal);
-public Q_SLOTS:
+public slots:
     void dataBufferSizeChanged(int data_buffer_size);
     void removeSignal(struct Signal xaxis, struct Signal yaxis);
-Q_SIGNALS:
+signals:
     void dataChanged();
 private:
     QVector<QSharedPointer<PlotBuffer>> m_data_buffer;

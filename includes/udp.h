@@ -49,31 +49,30 @@ class UDP: public QObject
 
 public:
     UDP(Plots* parent, QMutex* mutex, PlotBuffers* data_buffers, Signals* signal, TriggerWidget* trigger);
-    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int redraw_count, bool export_data, int use_data_count, QString filename);
+    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int redraw_count, int use_data_count, QString export_path, QString project_name);
     bool init();
     struct udp_message_puffer getValueIndexBefore(int index); // returns value "index" before actual m_udp_index
     int64_t calculateTimedifference();
     ~UDP();
-public Q_SLOTS:
+public slots:
     void readData();
     void connectDataReady();
     void disconnectDataReady();
     void timerTimeout();
     void exportFinished();
 
-Q_SIGNALS:
+signals:
     void newData();
     void triggerFinished();
     void dataChanged();
+    void showInfoMessageBox(QString title, QString text);
+    void disableTrigger();
 
 private:
     int m_actual_index;
     QUdpSocket *m_socket;
     int m_use_data_count;
     int m_udp_buffer_size;
-
-    bool m_export_data;
-    QFile* file;
     bool m_if_file_ready;
 
     QMutex* m_mutex;
@@ -91,11 +90,12 @@ private:
     TriggerWidget *m_triggerwidget;
     double m_previous_value;
     int m_trigger_index;
-    bool m_triggered;
+    bool m_trigger_in_progress;
 
     int m_redraw_counter;
 
     QString m_filename;
+    QString m_project_name;
 
     // ring buffer
     int m_udp_index;
@@ -108,6 +108,7 @@ private:
     QTimer* m_timer;
 
     ExportData* m_export;
+    int64_t m_time_difference;
 
 
 };

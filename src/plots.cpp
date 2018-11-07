@@ -40,6 +40,7 @@ Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent
 
     m_mutex = new QMutex;
     m_udp = new UDP(this, m_mutex,m_data_buffers, signal, trigger);
+    connect(m_udp, &UDP::showInfoMessageBox, this, &Plots::showInfoMessageBox,Qt::ConnectionType::QueuedConnection);
 
 
 
@@ -49,7 +50,7 @@ Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent
     connect(this, &Plots::connectToReadyRead, m_udp, &UDP::connectDataReady, Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
     qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
-    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, bool,int, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
+    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, int, QString, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::changeRelativeHeaderPath, signal, &Signals::changeRelativeHeaderPath);
 
     connect(this, &Plots::dataBufferSizeChanged, m_data_buffers, &PlotBuffers::dataBufferSizeChanged);
@@ -188,41 +189,10 @@ void Plots::importSettings(){
         QJsonArray plots = object["Plots"].toArray();
 
         for(int i=0; i<plots.count(); i++){
-            createNewPlot();
+            Plot* plot = createNewPlot();
 
-            QJsonObject plot = plots[i].toObject();
-            if(plot.contains("Graphs")){
-                QJsonArray graphs = plot["Graphs"].toArray();
-                for(int j=0; j<graphs.count(); j++){
-
-                    QJsonObject graph = graphs[j].toObject();
-                    if (graph.contains("Color")&&graph.contains("GraphName")&&
-                            graph.contains("LineStyle") && graph.contains("ScatterStyle")&&
-                            graph.contains("Signal")){
-                        struct SettingsGraph settings;
-                        settings.name = graph["GraphName"].toString();
-                        settings.color = QColor(graph["Color"].toString());
-                        settings.scatterstyle = graph["ScatterStyle"].toInt();
-                        settings.linestyle = graph["LineStyle"].toInt();
-
-                        QJsonObject signal_settings = graph["Signal"].toObject();
-
-                        struct Signal signal;
-                        signal.datatype = signal_settings["Datatype"].toString();
-                        signal.index = signal_settings["Index"].toInt();
-                        signal.offset = signal_settings["Offset"].toInt();
-                        signal.name = signal_settings["Signalname"].toString();
-                        settings.signal_yaxis = signal;
-
-                        m_plots[i]->addGraphToPlot(&settings);
-                    }else{
-                        qDebug() << "Some settings not found";
-                    }
-
-
-
-                }
-            }
+            QJsonObject plot_settings = plots[i].toObject();
+            plot->importSettings(plot_settings);
         }
     }
 
@@ -247,12 +217,12 @@ Plot* Plots::createNewPlot()
 }
 
 void Plots::startUDP(){
-    Q_EMIT connectToReadyRead();
+    emit connectToReadyRead();
     m_ifudpLogging = 1;
 }
 
 void Plots::stopUDP(){
-    Q_EMIT disconnectToReadyRead();
+    emit disconnectToReadyRead();
     m_ifudpLogging=0;
 }
 
@@ -268,22 +238,21 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, int redraw_count, int use_data_count, QString export_filename, QString relative_header_path){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int redraw_count, int use_data_count, QString export_path, QString relative_header_path){
     m_project_name = project_name;
     m_hostaddress = hostname;
     m_plot_buffersize = plot_buffersize;
     m_udp_buffersize = udp_buffersize;
     m_data_buffersize = data_buffersize;
     m_port = port;
-    m_export_data = export_data;
     m_redraw_count = redraw_count;
     m_use_data_count = use_data_count;
     changeRelativeHeaderPath(relative_header_path);
     changeDataBufferSize(data_buffersize, udp_buffersize);
-    Q_EMIT dataBufferSizeChanged(data_buffersize);
-    Q_EMIT initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,redraw_count, export_data,use_data_count, export_filename);
+    emit dataBufferSizeChanged(data_buffersize);
+    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,redraw_count, use_data_count, export_path,project_name);
 
-    Q_EMIT resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
+    emit resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
 }
 
 void Plots::changeDataBufferSize(int data_buffersize, int udp_buffersize){
@@ -294,6 +263,13 @@ void Plots::changeDataBufferSize(int data_buffersize, int udp_buffersize){
     for(int i=0; i<data_buffersize; i++){
         m_data_buffer[i].resize(udp_buffersize);
     }
+}
+
+void Plots::showInfoMessageBox(QString title, QString text){
+    QMessageBox msgBox(m_parent);
+    msgBox.setWindowTitle(title);
+    msgBox.setText(text);
+    msgBox.exec();
 }
 
 Plots::~Plots(){

@@ -50,7 +50,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     accepted(); // initially setting settings
 }
 
-void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, bool export_data, QString export_filename){
+void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, QString export_filename){
     ui->spinbox_plot_buffer->setValue(static_cast<double>(plot_buffersize));
     ui->spinbox_udp_buffer->setValue(static_cast<double>(udp_buffersize));
     ui->spinbox_data_buffersize->setValue(static_cast<double>(data_buffersize));
@@ -58,7 +58,6 @@ void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, in
     ui->combo_hostname->setCurrentIndex(0);
     ui->txt_hostaddress->setText(hostname.toString());
     ui->txt_project_name->setText(project_name);
-    ui->checkbox_export_data->setChecked(export_data);
     ui->txt_export_path->setText(export_filename);
 }
 
@@ -70,7 +69,7 @@ void SettingsDialog::initSettings(){
     int data_buffersize = 500;
     int port = 60000;
     bool export_data = false;
-    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize,data_buffersize, port, export_data,"");
+    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize,data_buffersize, port, "");
 }
 
 void SettingsDialog::comboHostnameIndexChanged(int index){
@@ -98,7 +97,6 @@ void SettingsDialog::accepted(){
     data_buffersize = static_cast<int>(ui->spinbox_data_buffersize->value());
     redraw_count = static_cast<int>(ui->spinbox_redraw_count->value());
     port = static_cast<int>(ui->spinbox_port->value());
-    export_data = ui->checkbox_export_data->isChecked();
     use_data_count = static_cast<int>(ui->spinbox_use_element_count->value());
     relative_header_path = ui->txt_relative_header_path->text();
 
@@ -106,7 +104,7 @@ void SettingsDialog::accepted(){
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    Q_EMIT settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port, export_data, redraw_count, use_data_count, export_filename,relative_header_path);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port,redraw_count, use_data_count, export_filename,relative_header_path);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -114,21 +112,11 @@ SettingsDialog::~SettingsDialog()
     delete ui;
 }
 
-void SettingsDialog::on_txt_export_path_textChanged(const QString &arg1)
-{
-    if(arg1.compare("")==0){
-        ui->checkbox_export_data->setChecked(false);
-    }else{
-        ui->checkbox_export_data->setChecked(true);
-    }
-}
-
 void SettingsDialog::on_btn_browse_export_file_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-            tr("Set export file"), "/home",
-            tr("UDP Logger Data Files (*.udpLoggerData)"));
-    ui->txt_export_path->setText(fileName);
+    QString path = QFileDialog::getExistingDirectory(this,
+            tr("Set export file path"), "/home");
+    ui->txt_export_path->setText(path);
 }
 
 void SettingsDialog::createJSONObject(QJsonObject& object){
@@ -139,7 +127,6 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["NetworkSettings"] = network_settings;
     object["PlotPufferSize"] = static_cast<int>(ui->spinbox_plot_buffer->value());
     object["DataPufferSize"] = static_cast<int>(ui->spinbox_data_buffersize->value());
-    object["ExportData"] = ui->checkbox_export_data->isChecked();
     object["ExportDataFile"] =ui->txt_export_path->text();
     object["RedrawCount"] = static_cast<int>(ui->spinbox_redraw_count->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
@@ -150,7 +137,6 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
 
     ui->spinbox_plot_buffer->setValue(static_cast<double>(object["PlotPufferSize"].toInt()));
     ui->spinbox_data_buffersize->setValue(static_cast<double>(object["DataPufferSize"].toInt()));
-    ui->checkbox_export_data->setChecked(object["ExportData"].toBool());
     ui->spinbox_redraw_count->setValue(static_cast<double>(object["RedrawCount"].toInt()));
     ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
     ui->txt_relative_header_path->setText(object["relative_header_path"].toString());
@@ -164,6 +150,11 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
     ui->txt_project_name->setText(project_name);
     ui->txt_export_path->setText(object["ExportDataFile"].toString());
 
-    Q_EMIT accepted();
+    emit accepted();
+
+}
+
+void SettingsDialog::on_txt_export_path_textChanged(const QString &arg1)
+{
 
 }

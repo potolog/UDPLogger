@@ -25,7 +25,16 @@
 
 class Plot;
 
-struct SettingsGraph{
+struct Settings{
+    bool ifautomatic_range;
+    bool ifrelative_ranging;
+    double ymin; // manual ranging
+    double ymax; // manual ranging
+    double automatic_value;
+    QVector<struct SignalSettings> signal_settings;
+};
+
+struct SignalSettings{
     QColor color;
     int linestyle;
     int scatterstyle;
@@ -44,23 +53,24 @@ class changeGraphDialog : public QDialog
 
 public:
     explicit changeGraphDialog(Plot* parent_plot, QWidget* parent, Signals *signal);
-    void saveOldSettings();
-    struct SettingsGraph getSettings(int index){return m_settings[index];}
-    int getSignalCount(){return m_settings.count();}
+    //void saveOldSettings();
+    struct Settings getSettings(){return m_settings_old;}
+    int getSignalCount(){return m_settings_new.signal_settings.count();}
     void updateSignals();
-    bool isRelative(){return m_if_relative;}
-    bool isAutomatic(){return m_if_automatic_range;}
-    double yMin(){return m_ymin;}
-    double yMax(){return m_ymax;}
-    double automaticRange(){return m_automatic_range;}
+    bool isRelative(){return m_settings_new.ifrelative_ranging;}
+    bool isAutomatic(){return m_settings_new.ifautomatic_range;}
+    double yMin(){return m_settings_new.ymin;}
+    double yMax(){return m_settings_new.ymax;}
+    double automaticRange(){return m_settings_new.automatic_value;}
+    void setSettings(struct Settings& settings);
 
     ~changeGraphDialog();
-Q_SIGNALS:
-    void newGraph(struct SettingsGraph);
-    void changeGraphSettings(int index_graph, struct SettingsGraph new_settings, struct SettingsGraph old_settings, bool remove_signal);
-public Q_SLOTS:
-    void addElement(struct SettingsGraph* settings_import);
-private Q_SLOTS:
+signals:
+    void newGraph(struct SignalSettings);
+    void changeGraphSettings(int index_graph, struct SignalSettings new_settings, struct SignalSettings old_settings, bool remove_signal);
+public slots:
+    void addElement(struct SignalSettings* settings_import);
+private slots:
     void apply();
     void ok();
     void cancel();
@@ -78,14 +88,9 @@ private Q_SLOTS:
 private:
     Ui::changeGraphDialog *ui;
     Plot* m_parent;
-    QVector<struct SettingsGraph> m_settings; // old settings
-    QVector<struct SettingsGraph> m_settings_new;
+    struct Settings m_settings_old;
+    struct Settings m_settings_new;
     int m_previous_row;
-
-    double m_ymin, m_ymax;
-    double m_automatic_range;
-    bool m_if_relative;
-    bool m_if_automatic_range;
 
     Signals* m_signals;
 

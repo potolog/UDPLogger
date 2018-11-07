@@ -107,10 +107,14 @@ void TriggerWidget::on_spinbox_t_after_trigger_valueChanged(double arg1)
 void TriggerWidget::triggered(){
     if(!m_automatic_restart){
         ui->checkbox_enable_trigger->setChecked(false);
+        return;
     }
     ui->checkbox_enable_trigger->setChecked(true);
 }
 
 void TriggerWidget::disableTrigger(){
+    m_trigger_enabled = false;
+    m_automatic_restart = false;
+    ui->checkbox_restart_trigger->setChecked(false);
     ui->checkbox_enable_trigger->setChecked(false);
 }
