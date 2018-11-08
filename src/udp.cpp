@@ -55,19 +55,21 @@ bool UDP::init(){
     return init(QHostAddress::AnyIPv4, 60000, 400,200,10,1, "", "");
 }
 
-bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int redraw_count, int use_data_count, QString export_path, QString project_name){
+bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name){
 
     m_socket->disconnectFromHost();
     m_use_data_count = use_data_count;
     m_if_file_ready = 0;
     m_data_buffer_size = data_buffer_size;
-    m_redraw_count = redraw_count;
+    QTime time = QTime::currentTime();
+    m_last_refresh_time = time.minute()*60*1000+time.second()*1000+ time.msec();
+    m_refresh_rate = refresh_rate;
     m_udp_buffer_size = udp_buffer_size;
     m_udp_buffer.resize(udp_buffer_size);
     m_udp_index = 0;
     m_filename = export_path;
     m_project_name = project_name;
-    m_redraw_counter = 0;
+    m_data_changed = false;
 
     m_buffer_smaller_than_message = 0;
 
@@ -98,11 +100,6 @@ void UDP::readData(){
     if(m_udp_index >= m_udp_buffer_size){
         m_udp_index = 0;
     }
-
-    if(m_redraw_counter >= m_redraw_count){
-        m_redraw_counter = 0;
-    }
-
     struct udp_message_puffer puffer;
     qint64 size =  m_socket->readDatagram(puffer.puffer,UDP_CONSTANTS::max_data,nullptr, nullptr);
 
@@ -112,21 +109,33 @@ void UDP::readData(){
                            tr("This means, that not every signal can be plotted"));
     }
 
+    // save data in udp buffer
     m_mutex->lock(); // brauchts das locken überhaupt?
     m_udp_buffer[m_udp_index] = puffer;
+
+    // store data in data buffer which is the buffer for the plot
     if(m_ifread_data && m_actual_index==0){ // only every m_m_use_data_count data should be plottet
         // Attention, m_m_use_data_count and m_redrawcount problem
         // Add data to data buffer, so the diagrams will be refreshed
         m_data_buffers->addData(puffer.puffer,UDP_CONSTANTS::max_data);
+        m_data_changed = true;
 
-        if(m_redraw_counter == 0){
-            emit dataChanged();
-        }
-        m_redraw_counter++;
+
+    }
+    // refresh plot
+    QTime time = QTime::currentTime();
+    int ms = (time.minute()*60+time.second())*1000+time.msec();
+    int diff = ms-m_last_refresh_time;
+    if(static_cast<float>(diff) >= static_cast<float>(1000)/m_refresh_rate && m_data_changed){
+        m_data_changed = false;
+        m_last_refresh_time = ms;
+        qDebug() << "Difference: " + QString::number(diff)+"ms \n";
+        emit dataChanged();
     }
 
     m_mutex->unlock();
 
+    // Trigger
     if(m_triggerwidget->isTriggerEnabled() && !m_trigger_in_progress){
         double value = m_data_buffers->getValue(puffer.puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());
         double trigger_level = m_triggerwidget->getTriggerLevel();
@@ -196,6 +205,7 @@ void UDP::timerTimeout(){
     }
 
 
+     // index_before can also be negative, so it is possible to just subtract
     if(m_udp_buffer_size -(m_udp_index-index_before)< 0){
         emit showInfoMessageBox(QObject::tr("Bufferoverflow of UDP buffer"),
                                 QObject::tr("With the actual trigger time settings, "

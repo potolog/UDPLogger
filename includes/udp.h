@@ -49,7 +49,7 @@ class UDP: public QObject
 
 public:
     UDP(Plots* parent, QMutex* mutex, PlotBuffers* data_buffers, Signals* signal, TriggerWidget* trigger);
-    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int redraw_count, int use_data_count, QString export_path, QString project_name);
+    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name);
     bool init();
     struct udp_message_puffer getValueIndexBefore(int index); // returns value "index" before actual m_udp_index
     int64_t calculateTimedifference();
@@ -83,7 +83,11 @@ private:
 
     bool m_ifread_data;
     int m_data_buffer_size;
-    int m_redraw_count;
+
+    bool m_data_changed;
+    int m_last_refresh_time;
+    int m_refresh_rate;
+
     PlotBuffers *m_data_buffers;
     Signals* m_signals;
     int m_buffer_smaller_than_message;
@@ -91,8 +95,6 @@ private:
     double m_previous_value;
     int m_trigger_index;
     bool m_trigger_in_progress;
-
-    int m_redraw_counter;
 
     QString m_filename;
     QString m_project_name;
@@ -102,8 +104,6 @@ private:
     QVector<struct udp_message_puffer> m_udp_buffer;
 
     int64_t m_time_state;
-
-    wchar_t* m_python_program;
 
     QTimer* m_timer;
 

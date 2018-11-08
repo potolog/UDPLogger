@@ -174,12 +174,12 @@
      <item>
       <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>Redraw [every X Elements]</string>
+        <string>Refreshrate [Hz]</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="spinbox_redraw_count">
+      <widget class="QDoubleSpinBox" name="spinbox_refresh_rate">
        <property name="decimals">
         <number>0</number>
        </property>

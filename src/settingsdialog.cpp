@@ -31,7 +31,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->spinbox_udp_buffer->setRange(1,2147483647);
     ui->spinbox_data_buffersize->setRange(1,2147483647);
     ui->spinbox_port->setRange(0,65535);
-    ui->spinbox_redraw_count->setRange(1,2147483647);
+    ui->spinbox_refresh_rate->setRange(1,300);
     ui->txt_hostaddress->setInputMask("000.000.000.000;_");
     ui->spinbox_use_element_count->setRange(1,2147483647);
 
@@ -87,7 +87,7 @@ void SettingsDialog::comboHostnameIndexChanged(int index){
 void SettingsDialog::accepted(){
 
     int udp_buffersize, plot_buffersize, data_buffersize, port;
-    int redraw_count;
+    int refresh_rate;
     bool export_data;
     int use_data_count;
     QString relative_header_path;
@@ -95,7 +95,7 @@ void SettingsDialog::accepted(){
     udp_buffersize = static_cast<int>(ui->spinbox_udp_buffer->value());
     plot_buffersize = static_cast<int>(ui->spinbox_plot_buffer->value());
     data_buffersize = static_cast<int>(ui->spinbox_data_buffersize->value());
-    redraw_count = static_cast<int>(ui->spinbox_redraw_count->value());
+    refresh_rate = static_cast<int>(ui->spinbox_refresh_rate->value());
     port = static_cast<int>(ui->spinbox_port->value());
     use_data_count = static_cast<int>(ui->spinbox_use_element_count->value());
     relative_header_path = ui->txt_relative_header_path->text();
@@ -104,7 +104,7 @@ void SettingsDialog::accepted(){
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port,redraw_count, use_data_count, export_filename,relative_header_path);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port,refresh_rate, use_data_count, export_filename,relative_header_path);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -128,7 +128,7 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["PlotPufferSize"] = static_cast<int>(ui->spinbox_plot_buffer->value());
     object["DataPufferSize"] = static_cast<int>(ui->spinbox_data_buffersize->value());
     object["ExportDataFile"] =ui->txt_export_path->text();
-    object["RedrawCount"] = static_cast<int>(ui->spinbox_redraw_count->value());
+    object["RefreshRate"] = static_cast<int>(ui->spinbox_refresh_rate->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
     object["relative_header_path"] = ui->txt_relative_header_path->text();
 }
@@ -137,7 +137,7 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
 
     ui->spinbox_plot_buffer->setValue(static_cast<double>(object["PlotPufferSize"].toInt()));
     ui->spinbox_data_buffersize->setValue(static_cast<double>(object["DataPufferSize"].toInt()));
-    ui->spinbox_redraw_count->setValue(static_cast<double>(object["RedrawCount"].toInt()));
+    ui->spinbox_refresh_rate->setValue(static_cast<double>(object["RefreshRate"].toInt()));
     ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
     ui->txt_relative_header_path->setText(object["relative_header_path"].toString());
 
