@@ -44,9 +44,9 @@ public slots:
 signals:
     void dataChanged();
 private:
-    QVector<QSharedPointer<PlotBuffer>> m_data_buffer;
+    QVector<QSharedPointer<PlotBuffer>> m_plot_buffer;
     Signals* m_signals;
-    int m_data_buffer_size;
+    int m_plot_buffer_size;
 };
 
 #endif // PLOTBUFFER_H

@@ -20,35 +20,35 @@ PlotBuffers::PlotBuffers(Signals* signal):QObject(nullptr), m_signals(signal){
 PlotBuffers::~PlotBuffers(){}
 
 void PlotBuffers::dataBufferSizeChanged(int data_buffer_size){
-    m_data_buffer_size = data_buffer_size;
+    m_plot_buffer_size = data_buffer_size;
 }
 
 QSharedPointer<QCPGraphDataContainer> PlotBuffers::getBuffer(struct Signal xaxis, struct Signal yaxis){
 
-    for(int i=0; i<m_data_buffer.length(); i++){
-        auto index_x = m_data_buffer[i]->getIndexX();
-        auto index_y = m_data_buffer[i]->getIndexY();
+    for(int i=0; i<m_plot_buffer.length(); i++){
+        auto index_x = m_plot_buffer[i]->getIndexX();
+        auto index_y = m_plot_buffer[i]->getIndexY();
 
 
         if(index_x == xaxis.index && index_y == yaxis.index){
-            m_data_buffer[i]->increaseCounter();
-            return m_data_buffer[i];
+            m_plot_buffer[i]->increaseCounter();
+            return m_plot_buffer[i];
         }
     }
     QSharedPointer<PlotBuffer> buffer = QSharedPointer<PlotBuffer>(new PlotBuffer(xaxis.index, yaxis.index));
-    m_data_buffer.append(buffer);
-    m_data_buffer[m_data_buffer.length()-1]->increaseCounter();
-    return m_data_buffer[m_data_buffer.length()-1];
+    m_plot_buffer.append(buffer);
+    m_plot_buffer[m_plot_buffer.length()-1]->increaseCounter();
+    return m_plot_buffer[m_plot_buffer.length()-1];
 }
 
 // decreases the counter of the buffer which holds pointer_old
 void PlotBuffers::removeSignal(struct Signal xaxis, struct Signal yaxis){
-    for(int i=0; i<m_data_buffer.length(); i++){
-        int index_x = m_data_buffer[i]->getIndexX();
-        int index_y = m_data_buffer[i]->getIndexY();
+    for(int i=0; i<m_plot_buffer.length(); i++){
+        int index_x = m_plot_buffer[i]->getIndexX();
+        int index_y = m_plot_buffer[i]->getIndexY();
         if(index_x == xaxis.index && index_y == yaxis.index){
-            if(m_data_buffer[i]->decreaseCounter()<=0){
-                m_data_buffer.removeAt(i);
+            if(m_plot_buffer[i]->decreaseCounter()<=0){
+                m_plot_buffer.removeAt(i);
             }
             return;
         }
@@ -56,14 +56,14 @@ void PlotBuffers::removeSignal(struct Signal xaxis, struct Signal yaxis){
 }
 
 void PlotBuffers::removeGraph(struct Signal xaxis, struct Signal yaxis){
-    for (int i=0; i<m_data_buffer.length(); i++){
-        auto index_x = m_data_buffer[i]->getIndexX();
-        auto index_y = m_data_buffer[i]->getIndexY();
+    for (int i=0; i<m_plot_buffer.length(); i++){
+        auto index_x = m_plot_buffer[i]->getIndexX();
+        auto index_y = m_plot_buffer[i]->getIndexY();
 
         if(index_x == xaxis.index && index_y == yaxis.index){
-            int counter = m_data_buffer[i]->decreaseCounter();
+            int counter = m_plot_buffer[i]->decreaseCounter();
             if(counter <=0){ // should never be that the counter decreases below 0
-                m_data_buffer.removeAt(i);
+                m_plot_buffer.removeAt(i);
             }
         }
     }
@@ -98,9 +98,9 @@ double PlotBuffers::getValue(char* data, int length, struct Signal signal){
 }
 
 void PlotBuffers::addData(char* data, int length){
-    for(int i=0; i<m_data_buffer.length(); i++){
-        int index_xaxis = m_data_buffer[i]->getIndexX();
-        int index_yaxis = m_data_buffer[i]->getIndexY();
+    for(int i=0; i<m_plot_buffer.length(); i++){
+        int index_xaxis = m_plot_buffer[i]->getIndexX();
+        int index_yaxis = m_plot_buffer[i]->getIndexY();
 
         const int signal_count = 2;
 
@@ -118,13 +118,13 @@ void PlotBuffers::addData(char* data, int length){
         //data.add(new_data);
         //auto value = data.at(0);
         //data.remove(value->key);
-        //m_data_buffer = new QVector<PlotBuffer>;
+        //m_plot_buffer = new QVector<PlotBuffer>;
         QVector<QCPGraphData> new_data = {QCPGraphData(value[0],value[1])};
-        m_data_buffer[i]->add(new_data,true);
+        m_plot_buffer[i]->add(new_data,true);
 
-        for(int j=0; j<m_data_buffer[i]->size()-m_data_buffer_size; j++){
-            auto value_at_index = m_data_buffer[i]->at(0);
-            m_data_buffer[i]->remove(value_at_index->key);
+        for(int j=0; j<m_plot_buffer[i]->size()-m_plot_buffer_size; j++){
+            auto value_at_index = m_plot_buffer[i]->at(0);
+            m_plot_buffer[i]->remove(value_at_index->key);
         }
     }
 }
