@@ -31,7 +31,6 @@
 Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent(parent), m_signals(signal)
 {
     m_layout = new QVBoxLayout(parent);
-    m_index_buffer = 0;
     m_index_new_data = 0;
     m_ifudpLogging = false;
     m_use_data_count = 0;
@@ -238,31 +237,15 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int redraw_count, int use_data_count, QString export_path, QString relative_header_path){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path){
     m_project_name = project_name;
     m_hostaddress = hostname;
-    m_plot_buffersize = plot_buffersize;
-    m_udp_buffersize = udp_buffersize;
-    m_data_buffersize = data_buffersize;
     m_port = port;
-    m_redraw_count = redraw_count;
+    m_refresh_rate = refresh_rate;
     m_use_data_count = use_data_count;
     changeRelativeHeaderPath(relative_header_path);
-    changeDataBufferSize(data_buffersize, udp_buffersize);
-    emit dataBufferSizeChanged(data_buffersize);
-    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,redraw_count, use_data_count, export_path,project_name);
-
-    emit resizePlotBuffer(m_udp_buffersize, m_plot_buffersize);
-}
-
-void Plots::changeDataBufferSize(int data_buffersize, int udp_buffersize){
-    m_data_buffersize=data_buffersize;
-    m_udp_buffersize = udp_buffersize;
-    m_data_buffer.resize(data_buffersize);
-
-    for(int i=0; i<data_buffersize; i++){
-        m_data_buffer[i].resize(udp_buffersize);
-    }
+    emit dataBufferSizeChanged(plot_buffersize);
+    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,refresh_rate, use_data_count, export_path,project_name);
 }
 
 void Plots::showInfoMessageBox(QString title, QString text){
