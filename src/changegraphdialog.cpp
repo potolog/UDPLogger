@@ -223,6 +223,11 @@ void changeGraphDialog::apply(){
         m_settings_new.signal_settings[row].name = ui->txt_name->toPlainText();
         m_settings_new.signal_settings[row].signal_yaxis = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
         m_settings_new.signal_settings[row].signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->currentData().toInt());
+        m_settings_new.ymin = ui->spinbox_y_min->value();
+        m_settings_new.ymax = ui->spinbox_y_max->value();
+        m_settings_new.automatic_value = ui->spinbox_range_adjustment->value();
+        m_settings_new.ifautomatic_range = ui->checkbox_if_automatic_range->isChecked();
+        m_settings_new.ifrelative_ranging = ui->rb_relative->isChecked();
     }
 
 
