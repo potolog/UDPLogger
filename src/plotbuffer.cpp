@@ -19,8 +19,8 @@ PlotBuffers::PlotBuffers(Signals* signal):QObject(nullptr), m_signals(signal){
 
 PlotBuffers::~PlotBuffers(){}
 
-void PlotBuffers::dataBufferSizeChanged(int data_buffer_size){
-    m_plot_buffer_size = data_buffer_size;
+void PlotBuffers::plotBufferSizeChanged(int plot_buffer_size){
+    m_plot_buffer_size = plot_buffer_size;
 }
 
 QSharedPointer<QCPGraphDataContainer> PlotBuffers::getBuffer(struct Signal xaxis, struct Signal yaxis){

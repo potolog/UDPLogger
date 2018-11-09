@@ -36,7 +36,7 @@ class SettingsDialog : public QDialog
 
 public:
     explicit SettingsDialog(Plots *parent = nullptr);
-    void setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, QString export_filename);
+    void setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, QString export_filename);
     void createJSONObject(QJsonObject& object);
     void readJSONObject(QJsonObject& object, QString project_name);
     void initSettings();
@@ -48,7 +48,7 @@ private slots:
     void on_btn_browse_export_file_clicked();
 
 signals:
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int refresh_rate, int skip_element,QString export_filename, QString relative_header_path);
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int skip_element,QString export_filename, QString relative_header_path);
 
 private:
     Ui::SettingsDialog *ui;

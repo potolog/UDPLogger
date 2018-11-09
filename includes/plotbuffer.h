@@ -39,7 +39,7 @@ public:
     static inline int* getIntPointer(int position,char* data){return (int*)(&data[position]);}
     static double getValue(char* data, int length, struct Signal signal);
 public slots:
-    void dataBufferSizeChanged(int data_buffer_size);
+    void plotBufferSizeChanged(int plot_buffer_size);
     void removeSignal(struct Signal xaxis, struct Signal yaxis);
 signals:
     void dataChanged();

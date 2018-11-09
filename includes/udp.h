@@ -49,7 +49,7 @@ class UDP: public QObject
 
 public:
     UDP(Plots* parent, QMutex* mutex, PlotBuffers* data_buffers, Signals* signal, TriggerWidget* trigger);
-    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name);
+    bool init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name);
     bool init();
     struct udp_message_puffer getValueIndexBefore(int index); // returns value "index" before actual m_udp_index
     int64_t calculateTimedifference();

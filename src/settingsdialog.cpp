@@ -29,7 +29,6 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     ui->setupUi(this);
     ui->spinbox_plot_buffer->setRange(1,2147483647);
     ui->spinbox_udp_buffer->setRange(1,2147483647);
-    ui->spinbox_data_buffersize->setRange(1,2147483647);
     ui->spinbox_port->setRange(0,65535);
     ui->spinbox_refresh_rate->setRange(1,300);
     ui->txt_hostaddress->setInputMask("000.000.000.000;_");
@@ -50,10 +49,9 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     accepted(); // initially setting settings
 }
 
-void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, QString export_filename){
+void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, QString export_filename){
     ui->spinbox_plot_buffer->setValue(static_cast<double>(plot_buffersize));
     ui->spinbox_udp_buffer->setValue(static_cast<double>(udp_buffersize));
-    ui->spinbox_data_buffersize->setValue(static_cast<double>(data_buffersize));
     ui->spinbox_port->setValue(port);
     ui->combo_hostname->setCurrentIndex(0);
     ui->txt_hostaddress->setText(hostname.toString());
@@ -66,10 +64,8 @@ void SettingsDialog::initSettings(){
     QHostAddress hostaddress = QHostAddress::Any;
     int udp_buffersize = 400;
     int plot_buffersize = 200;
-    int data_buffersize = 500;
     int port = 60000;
-    bool export_data = false;
-    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize,data_buffersize, port, "");
+    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize, port, "");
 }
 
 void SettingsDialog::comboHostnameIndexChanged(int index){
@@ -86,7 +82,7 @@ void SettingsDialog::comboHostnameIndexChanged(int index){
 
 void SettingsDialog::accepted(){
 
-    int udp_buffersize, plot_buffersize, data_buffersize, port;
+    int udp_buffersize, plot_buffersize, port;
     int refresh_rate;
     bool export_data;
     int use_data_count;
@@ -94,7 +90,6 @@ void SettingsDialog::accepted(){
 
     udp_buffersize = static_cast<int>(ui->spinbox_udp_buffer->value());
     plot_buffersize = static_cast<int>(ui->spinbox_plot_buffer->value());
-    data_buffersize = static_cast<int>(ui->spinbox_data_buffersize->value());
     refresh_rate = static_cast<int>(ui->spinbox_refresh_rate->value());
     port = static_cast<int>(ui->spinbox_port->value());
     use_data_count = static_cast<int>(ui->spinbox_use_element_count->value());
@@ -104,7 +99,7 @@ void SettingsDialog::accepted(){
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, data_buffersize,  port,refresh_rate, use_data_count, export_filename,relative_header_path);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, port,refresh_rate, use_data_count, export_filename,relative_header_path);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -126,7 +121,6 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     network_settings["UDPPufferSize"] = static_cast<int>(ui->spinbox_udp_buffer->value());
     object["NetworkSettings"] = network_settings;
     object["PlotPufferSize"] = static_cast<int>(ui->spinbox_plot_buffer->value());
-    object["DataPufferSize"] = static_cast<int>(ui->spinbox_data_buffersize->value());
     object["ExportDataFile"] =ui->txt_export_path->text();
     object["RefreshRate"] = static_cast<int>(ui->spinbox_refresh_rate->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
@@ -136,7 +130,6 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
 void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
 
     ui->spinbox_plot_buffer->setValue(static_cast<double>(object["PlotPufferSize"].toInt()));
-    ui->spinbox_data_buffersize->setValue(static_cast<double>(object["DataPufferSize"].toInt()));
     ui->spinbox_refresh_rate->setValue(static_cast<double>(object["RefreshRate"].toInt()));
     ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
     ui->txt_relative_header_path->setText(object["relative_header_path"].toString());

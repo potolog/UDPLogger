@@ -49,10 +49,10 @@ Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent
     connect(this, &Plots::connectToReadyRead, m_udp, &UDP::connectDataReady, Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
     qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
-    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, int, QString, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
+    connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, QString, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
     connect(this, &Plots::changeRelativeHeaderPath, signal, &Signals::changeRelativeHeaderPath);
 
-    connect(this, &Plots::dataBufferSizeChanged, m_data_buffers, &PlotBuffers::dataBufferSizeChanged);
+    connect(this, &Plots::plotBufferSizeChanged, m_data_buffers, &PlotBuffers::plotBufferSizeChanged);
 
 
     m_settings_dialog = new SettingsDialog(this);
@@ -70,7 +70,6 @@ void Plots::removeGraph(struct Signal xaxis, struct Signal yaxis){
 
 void Plots::deletePlot(int index){
     qDebug() << "Index: " << index;
-    bool returnvalue;
     //m_layout->removeWidget(m_plots.at(index));
     // disconnecten!
     QLayoutItem* item;
@@ -237,15 +236,15 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path){
     m_project_name = project_name;
     m_hostaddress = hostname;
     m_port = port;
     m_refresh_rate = refresh_rate;
     m_use_data_count = use_data_count;
     changeRelativeHeaderPath(relative_header_path);
-    emit dataBufferSizeChanged(plot_buffersize);
-    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,data_buffersize,refresh_rate, use_data_count, export_path,project_name);
+    emit plotBufferSizeChanged(plot_buffersize);
+    emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,refresh_rate, use_data_count, export_path,project_name);
 }
 
 void Plots::showInfoMessageBox(QString title, QString text){

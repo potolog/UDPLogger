@@ -55,15 +55,15 @@ public slots:
     void settings();
     void startUDP();
     void stopUDP();
-    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int data_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path);
+    void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path);
     void showInfoMessageBox(QString title, QString text);
 signals:
     void startUDPReadData();
     void connectToReadyRead();
     void disconnectToReadyRead();
-    void initUDP(QHostAddress hostaddress, quint16 port, int buffer_size,int data_size, int refresh_rate, int m_use_data_count, QString export_path, QString project_name);
+    void initUDP(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int refresh_rate, int m_use_data_count, QString export_path, QString project_name);
     void changeRelativeHeaderPath(QString relative_header_path);
-    void dataBufferSizeChanged(int data_buffer_size);
+    void plotBufferSizeChanged(int data_buffer_size);
 private:
     QWidget* m_parent;
     QVector<Plot*> m_plots;

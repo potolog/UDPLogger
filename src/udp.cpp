@@ -52,15 +52,14 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 
 }
 bool UDP::init(){
-    return init(QHostAddress::AnyIPv4, 60000, 400,200,10,1, "", "");
+    return init(QHostAddress::AnyIPv4, 60000,200,10,1, "", "");
 }
 
-bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int data_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name){
+bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int refresh_rate, int use_data_count, QString export_path, QString project_name){
 
     m_socket->disconnectFromHost();
     m_use_data_count = use_data_count;
     m_if_file_ready = 0;
-    m_data_buffer_size = data_buffer_size;
     QTime time = QTime::currentTime();
     m_last_refresh_time = time.minute()*60*1000+time.second()*1000+ time.msec();
     m_refresh_rate = refresh_rate;
