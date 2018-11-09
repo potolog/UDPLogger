@@ -16,3 +16,6 @@ TODO:
 
 Dependencies:
 - xlnt: https://github.com/tfussell/xlnt
+- netcdf_c++4: https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
+
+For debugging, the libraries must be installed with debug information
