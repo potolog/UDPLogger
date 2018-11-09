@@ -45,7 +45,7 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 
 
     connect(this, &UDP::triggerFinished, trigger, &TriggerWidget::triggered, Qt::ConnectionType::QueuedConnection);
-    connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::QueuedConnection);
+    connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::BlockingQueuedConnection);
 
     m_trigger_in_progress = false;
 
@@ -70,6 +70,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int 
     m_filename = export_path;
     m_project_name = project_name;
     m_data_changed = false;
+    m_trigger_in_progress = false;
 
     m_buffer_smaller_than_message = 0;
 
@@ -197,6 +198,7 @@ void UDP::timerTimeout(){
         if(std::abs(time_before) <= 0.000001){
             emit disableTrigger();
             emit showInfoMessageBox(QObject::tr("Trigger times invalid"), QObject::tr("Please set 'Time before trigger' or 'Time after trigger' unequal to zero"));
+            m_trigger_in_progress = false;
             return;
         }
         index_before = m_trigger_index - static_cast<int>(time_before)/m_time_difference;
