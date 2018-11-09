@@ -193,8 +193,8 @@ void UDP::timerTimeout(){
     double time_before = m_triggerwidget->getTimeBeforeTrigger();
 
     int index_before;
-    if(abs(time_after) <= 0.000001){
-        if(abs(time_before) <= 0.000001){
+    if(std::abs(time_after) <= 0.000001){
+        if(std::abs(time_before) <= 0.000001){
             emit disableTrigger();
             emit showInfoMessageBox(QObject::tr("Trigger times invalid"), QObject::tr("Please set 'Time before trigger' or 'Time after trigger' unequal to zero"));
             return;
