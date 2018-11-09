@@ -181,24 +181,6 @@ void changeGraphDialog::updateData2(){
 
 }
 
-//// Save all settings if cancel was pressed
-//void changeGraphDialog::saveOldSettings(){
-
-//    m_settings_old.signal_settings.clear();
-
-//    struct SignalSettings settings;
-
-
-//    for (int i=0; i < m_parent->plottableCount(); i++){
-//        settings.linestyle = m_parent->graph(i)->lineStyle();
-//        settings.scatterstyle = m_parent->graph(i)->scatterStyle().shape();
-//        settings.color = m_parent->graph(i)->pen().color();
-//        settings.name = m_parent->graph(i)->name();
-
-//        m_settings_old.signal_settings.append(settings);
-//    }
-//}
-
 void changeGraphDialog::cancel(){
     // restore old data
     for (int i=0; i<m_settings_old.signal_settings.length(); i++){
