@@ -60,6 +60,7 @@ public slots:
     void disconnectDataReady();
     void timerTimeout();
     void exportFinished();
+    void refreshPlot();
 
 signals:
     void newData();

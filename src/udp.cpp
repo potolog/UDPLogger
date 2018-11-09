@@ -43,11 +43,16 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
     connect(m_socket, &QUdpSocket::readyRead, this, &UDP::readData);
     m_ifread_data = 0;
 
+    m_trigger_in_progress = false;
+
+    m_timer = new QTimer(this);
+
 
     connect(this, &UDP::triggerFinished, trigger, &TriggerWidget::triggered, Qt::ConnectionType::QueuedConnection);
     connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::BlockingQueuedConnection);
+    connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
 
-    m_trigger_in_progress = false;
+
 
 
 }
@@ -60,8 +65,6 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int 
     m_socket->disconnectFromHost();
     m_use_data_count = use_data_count;
     m_if_file_ready = 0;
-    QTime time = QTime::currentTime();
-    m_last_refresh_time = time.minute()*60*1000+time.second()*1000+ time.msec();
     m_refresh_rate = refresh_rate;
     m_udp_buffer_size = udp_buffer_size;
     m_udp_buffer.resize(udp_buffer_size);
@@ -84,9 +87,18 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int 
         return 0;
     }
 
+    m_timer->start(1000/refresh_rate);
+
     std::cout << "Bind: OK" << std::endl;
 
     return 1;
+}
+
+void UDP::refreshPlot(){
+    if(m_data_changed){
+        m_data_changed = false;
+        emit dataChanged();
+    }
 }
 
 void UDP::readData(){
@@ -121,16 +133,6 @@ void UDP::readData(){
         m_data_changed = true;
 
 
-    }
-    // refresh plot
-    QTime time = QTime::currentTime();
-    int ms = (time.minute()*60+time.second())*1000+time.msec();
-    int diff = ms-m_last_refresh_time;
-    if(static_cast<float>(diff) >= static_cast<float>(1000)/m_refresh_rate && m_data_changed){
-        m_data_changed = false;
-        m_last_refresh_time = ms;
-        qDebug() << "Difference: " + QString::number(diff)+"ms \n";
-        emit dataChanged();
     }
 
     m_mutex->unlock();
