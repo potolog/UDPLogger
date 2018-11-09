@@ -9,7 +9,7 @@ class ExportData : public QThread
 {
     Q_OBJECT
 public:
-    explicit ExportData(QString path, QString project_name,QVector<struct udp_message_puffer> &data,int index_first, int index_last, int  udp_buffer_size, Signals* signal, QObject *parent = nullptr);
+    explicit ExportData(QString path, QString project_name,QVector<struct udp_message_puffer> &data,int index_first, uint64_t index_last, int  udp_buffer_size, Signals* signal, QObject *parent = nullptr);
     void run() override;
 private:
     QVector<struct udp_message_puffer> m_data;

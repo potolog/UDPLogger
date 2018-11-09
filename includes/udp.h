@@ -71,6 +71,8 @@ signals:
 
 private:
     int m_actual_index;
+    int64_t m_udp_global_index;
+
     QUdpSocket *m_socket;
     int m_use_data_count;
     int m_udp_buffer_size;
@@ -86,7 +88,6 @@ private:
     int m_data_buffer_size;
 
     bool m_data_changed;
-    int m_last_refresh_time;
     int m_refresh_rate;
 
     PlotBuffers *m_data_buffers;
@@ -94,7 +95,7 @@ private:
     int m_buffer_smaller_than_message;
     TriggerWidget *m_triggerwidget;
     double m_previous_value;
-    int m_trigger_index;
+    int64_t m_trigger_index;
     bool m_trigger_in_progress;
 
     QString m_filename;

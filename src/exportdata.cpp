@@ -5,7 +5,7 @@
 #include <netcdf>
 #include <vector>
 
-ExportData::ExportData(QString path,QString project_name, QVector<struct udp_message_puffer> &data,int index_first, int index_last,int  udp_buffer_size, Signals* signal, QObject *parent) :
+ExportData::ExportData(QString path,QString project_name, QVector<struct udp_message_puffer> &data,int index_first, uint64_t index_last,int  udp_buffer_size, Signals* signal, QObject *parent) :
     QThread(parent), m_path(path), m_first(index_first),m_last(index_last), m_udp_buffer_size(udp_buffer_size), m_signals(signal), m_project_name(project_name)
 {
 
@@ -18,9 +18,10 @@ ExportData::ExportData(QString path,QString project_name, QVector<struct udp_mes
 
     m_data.resize(m_last-m_first);
     int index = 0;
-    for(int i=start_index; i< start_index+(m_last - m_first); i++){
-        if(i>= m_udp_buffer_size){
-            i=0;// circle buffer
+    int buffer_index = start_index;
+    for(int i=0; i< (m_last - m_first); i++){ // m_first can be negative, so subtraction is possible
+        if(buffer_index >= m_udp_buffer_size){
+            buffer_index=0;// circle buffer
         }
         m_data[index] = data[i];
         index ++;

@@ -77,6 +77,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int 
     m_buffer_smaller_than_message = 0;
 
     m_actual_index = 0;
+    m_udp_global_index = 0;
 
     if (!m_socket->bind(hostaddress, port)){
         QMessageBox msgBox;
@@ -131,12 +132,9 @@ void UDP::readData(){
         // Add data to data buffer, so the diagrams will be refreshed
         m_data_buffers->addData(puffer.puffer,UDP_CONSTANTS::max_data);
         m_data_changed = true;
-
-
     }
 
     m_mutex->unlock();
-
     // Trigger
     if(m_triggerwidget->isTriggerEnabled() && !m_trigger_in_progress){
         double value = m_data_buffers->getValue(puffer.puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());
@@ -153,12 +151,13 @@ void UDP::readData(){
             QTimer::singleShot(m_triggerwidget->getTimeAfterTrigger()*1000,this,&UDP::timerTimeout);
             m_trigger_in_progress = true;
             m_previous_value = value;
-            m_trigger_index = m_udp_index;
+            m_trigger_index = m_udp_global_index;
         }
     }
 
     m_actual_index ++;
     m_udp_index++;
+    m_udp_global_index++;
 }
 
 void UDP::connectDataReady(){
@@ -204,21 +203,24 @@ void UDP::timerTimeout(){
         }
         index_before = m_trigger_index - static_cast<int>(time_before)/m_time_difference;
     }else{
-        index_before = m_trigger_index - static_cast<int>(time_before/time_after*(m_udp_index-m_trigger_index));
+        // can be assumed, that index_before don't get an overflow
+        index_before = m_trigger_index - static_cast<int>(time_before/time_after*(m_udp_global_index-m_trigger_index));
     }
 
 
      // index_before can also be negative, so it is possible to just subtract
-    if(m_udp_buffer_size -(m_udp_index-index_before)< 0){
+    if(m_udp_buffer_size -(m_udp_global_index-index_before)< 0){
         emit showInfoMessageBox(QObject::tr("Bufferoverflow of UDP buffer"),
                                 QObject::tr("With the actual trigger time settings, "
                                             "the number of values which should be stored (")+
-                                QString::number(m_udp_index-index_before)+") "+tr("is higher "
-                                "than the UDP buffer size. So the data repeats. Please set "
+                                QString::number(m_udp_global_index-index_before)+") "+tr("is higher "
+                                "than the UDP buffer size (")+QString::number(m_udp_buffer_size)+tr("). So the data repeats. Please set "
                                 "the trigger times lower or set the UDP buffersize to a higher value"));
+        m_trigger_in_progress = false;
+        return;
     }
 
-    m_export = new ExportData(m_filename,m_project_name,m_udp_buffer,index_before, m_udp_index, m_udp_buffer_size,m_signals,this);
+    m_export = new ExportData(m_filename,m_project_name,m_udp_buffer,index_before, m_udp_global_index, m_udp_buffer_size,m_signals,this);
     connect(m_export, &ExportData::resultReady, this, &UDP::exportFinished);
     connect(m_export, &ExportData::showInfoMessage, m_parent,&Plots::showInfoMessageBox, Qt::ConnectionType::QueuedConnection);
     m_export->run();
