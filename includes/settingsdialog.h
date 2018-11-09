@@ -36,7 +36,7 @@ class SettingsDialog : public QDialog
 
 public:
     explicit SettingsDialog(Plots *parent = nullptr);
-    void setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, QString export_filename);
+    void setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, QString export_filename);
     void createJSONObject(QJsonObject& object);
     void readJSONObject(QJsonObject& object, QString project_name);
     void initSettings();

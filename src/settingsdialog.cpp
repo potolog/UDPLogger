@@ -49,7 +49,7 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     accepted(); // initially setting settings
 }
 
-void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, QString export_filename){
+void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port,int refresh_rate, QString export_filename){
     ui->spinbox_plot_buffer->setValue(static_cast<double>(plot_buffersize));
     ui->spinbox_udp_buffer->setValue(static_cast<double>(udp_buffersize));
     ui->spinbox_port->setValue(port);
@@ -57,6 +57,7 @@ void SettingsDialog::setSettings(QString project_name, QHostAddress hostname, in
     ui->txt_hostaddress->setText(hostname.toString());
     ui->txt_project_name->setText(project_name);
     ui->txt_export_path->setText(export_filename);
+    ui->spinbox_refresh_rate->setValue(refresh_rate);
 }
 
 void SettingsDialog::initSettings(){
@@ -65,7 +66,8 @@ void SettingsDialog::initSettings(){
     int udp_buffersize = 400;
     int plot_buffersize = 200;
     int port = 60000;
-    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize, port, "");
+    int refresh_rate = 60;
+    setSettings(project_name, hostaddress, udp_buffersize, plot_buffersize, port,refresh_rate, "");
 }
 
 void SettingsDialog::comboHostnameIndexChanged(int index){
