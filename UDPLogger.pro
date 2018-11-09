@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets printsupport
+QT += core gui widgets printsupport
 QT += network
 
 TARGET = "com.github.Murmele.UDPLogger"
@@ -26,6 +26,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 equals(flatpak,true){
     LIBS+= -L/app/lib -lxlnt
+    LIBS+= -L/app/lib -lnetcdf_c++4
 }else: unix:!android {
     LIBS += -L/usr/local/lib -lnetcdf_c++4
     LIBS += -L/usr/lib -lxlnt
@@ -34,7 +35,6 @@ equals(flatpak,true){
 
 CONFIG += c++11 \
         c++14
-        debug
 INCLUDEPATH += \
     src \
     includes
