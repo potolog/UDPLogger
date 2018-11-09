@@ -14,7 +14,10 @@
 	"--share=network",
 	"--filesystem=xdg-config/kdeglobals:ro"],	
     "modules": [
-		"modules/xlnt.json",	
+		"modules/xlnt.json",
+		"modules/hdf5.json",
+		"modules/netcdf.json",
+		"modules/netcdf_c++4.json",	
 		{
 		"name": "udpLogger",
 		"buildsystem": "qmake",
@@ -31,7 +34,8 @@
 		"sources": [
 		  {
 			"type": "git",
-			"url": "https://github.com/Murmele/UDPLogger.git"
+			"url": "https://github.com/Murmele/UDPLogger.git",
+			"tag": "V2.1"
 		  }
 		]
 		}
