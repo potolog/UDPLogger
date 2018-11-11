@@ -125,7 +125,7 @@ void Plot::addGraphToPlot(struct SignalSettings* settings){
 }
 
 void Plot::deletePlot(){
-    deletePlot2(this->m_index);
+    deletePlot2(this);
 }
 
 void Plot::newData(){

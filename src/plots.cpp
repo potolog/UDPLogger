@@ -68,18 +68,17 @@ void Plots::removeGraph(struct Signal xaxis, struct Signal yaxis){
     m_data_buffers->removeGraph(xaxis, yaxis);
 }
 
-void Plots::deletePlot(int index){
-    qDebug() << "Index: " << index;
-    //m_layout->removeWidget(m_plots.at(index));
-    // disconnecten!
-    QLayoutItem* item;
-    item = m_layout->takeAt( index );
-    qDebug() << "Item -> widget(): " <<item->widget();
-    if(item->widget() == m_plots.at(index)){
-        qDebug() << "Deleting Object";
-        item->widget()->deleteLater();
-        m_plots.remove(index);
+void Plots::deletePlot(Plot* plot_address){
+
+    plot_address->deleteLater();
+
+    for(int i=0; i<m_plots.length(); i++){
+        if(m_plots.at(i) == plot_address){
+            m_plots.remove(i);
+            break;
+        }
     }
+
 }
 
 void Plots::exportSettings(){
@@ -139,7 +138,7 @@ void Plots::importSettings(){
     // before importing remove everything!!!!
     int size = m_plots.size();
     for (int i=0; i<size; i++){
-        deletePlot(0);
+        deletePlot(m_plots.at(0));
     }
 
     QString fileName = QFileDialog::getOpenFileName(this,

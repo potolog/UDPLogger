@@ -51,7 +51,7 @@ public slots:
     void newGraph(struct SignalSettings settings);
     void changeGraphSettings(int index_graph, struct SignalSettings new_settings, struct SignalSettings old_settings, bool remove_signal);
 signals:
-    void deletePlot2(int index);
+    void deletePlot2(Plot* plot_address);
     void removeSignal(struct Signal xaxis,struct Signal yaxis);
 
 private:

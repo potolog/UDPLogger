@@ -49,7 +49,7 @@ public:
     QSharedPointer<QCPGraphDataContainer> getBuffer(struct Signal xaxis, struct Signal yaxis);
     QWidget* getParent(){return m_parent;}
 public slots:
-    void deletePlot(int index);
+    void deletePlot(Plot *plot_address);
     void exportSettings();
     void importSettings();
     void settings();
