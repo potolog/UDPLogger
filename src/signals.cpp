@@ -441,7 +441,7 @@ void Signals::createMemcpyStrings(QVector<QString>& memcpy_strings){
     QString pointer;
 
     for (auto signal : m_signals){
-        pointer = "pointer += " + QString::number(signal.offset)+";\n";
+        pointer = "pointer = udp_buffer + " + QString::number(signal.offset)+";\n";
         memcpy_strings.append(pointer);
         if(!isStruct(signal.name)){
             memcpy = prefix+"pointer, "+"&"+ signal.name+", sizeof("+signal.name+")"+postfix;
