@@ -48,6 +48,7 @@ public:
     void disableStopUDP();
     void changeDockVisibility(bool checked);
     void changedDockVisibility(bool visible);
+    void showInfoMessageBox(QString title, QString text);
 
 
 private:

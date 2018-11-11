@@ -48,6 +48,7 @@ public:
     void importJSonFile(QString filename);
     int importXLSX(QString filename);
     bool isStruct(QString variablename);
+    QString validateDatatypes(QString datatype, bool &success);
 private:
     bool ifVariableNameExist(const QVector<struct input_arguments>& arguments, QString variable_name, bool& ifstruct);
     void getInputArguments(QVector<struct input_arguments>& arguments);
@@ -60,6 +61,7 @@ public slots:
 
 signals:
     void signalsChanged();
+    void showMessageBox(QString title, QString text);
 
 private:
    QVector<struct Signal> m_signals;

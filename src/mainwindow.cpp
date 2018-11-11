@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_vlayout = new QVBoxLayout(this);
 
     m_signal = new Signals;
+    connect(m_signal, &Signals::showMessageBox, this, &MainWindow::showInfoMessageBox);
 
     m_trigger_menu = new QDockWidget(tr("Store signals to file trigger"),this);
     connect(m_trigger_menu, &QDockWidget::visibilityChanged, this,&MainWindow::changedDockVisibility);
@@ -153,4 +154,11 @@ void MainWindow::changeDockVisibility(bool checked){
 void MainWindow::changedDockVisibility(bool visible){
     Q_UNUSED(visible);
     m_show_trigger_dock->setChecked(m_trigger_menu->isVisible());
+}
+
+void MainWindow::showInfoMessageBox(QString title, QString text){
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle(title);
+    msgBox.setText(text);
+    msgBox.exec();
 }

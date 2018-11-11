@@ -51,17 +51,24 @@ void Signals::importJSonFile(QString filename){
         QVector<struct Signal> signal_vector;
         struct Signal signal_element;
 
+        bool success = true;
         for(int i=0; i<imported_signals.count(); i++){
             QJsonObject signal = imported_signals[i].toObject();
-            signal_element.datatype = signal["Datatype"].toString();
+            signal_element.datatype = validateDatatypes(signal["Datatype"].toString(),success);
             signal_element.index = signal["Index"].toInt();
             signal_element.offset = signal["Offset"].toInt();
             signal_element.name = signal["Signalname"].toString();
             signal_vector.append(signal_element);
-        }
-        setSignals(&signal_vector);
+            if(signal_element.datatype.compare("")==0){
+                success = false;
+                emit showMessageBox(tr("No valid datatype"),QString(tr("The datatype of '%1' (%2) is not valid! \n No signals changed.")).arg(signal_element.name).arg(signal_element.datatype));
+                break;
+            }
 
-        emit signalsChanged();
+        }
+        if(success){
+            setSignals(&signal_vector);
+        }
     }
 
 
@@ -124,21 +131,61 @@ int Signals::importXLSX(QString filename){
      }
 
      int offset = 0;
-
+     bool success = true;
      for(unsigned long i=description_row+1; i< theWholeSpreadSheet.size(); i++){
          struct Signal signal;
-         signal.datatype = QString::fromStdString(theWholeSpreadSheet.at(i).at(datatype_column));
+         signal.datatype = validateDatatypes(QString::fromStdString(theWholeSpreadSheet.at(i).at(datatype_column)),success);
          signal.name = QString::fromStdString(theWholeSpreadSheet.at(i).at(name_column));
          signal.index = std::stoi(theWholeSpreadSheet.at(i).at(index_column));
          signal.offset = offset;
          offset+= std::stoi(theWholeSpreadSheet.at(i).at(size_column));
          new_signals.append(signal);
+         if(!success){
+             success = false;
+             emit showMessageBox(tr("No valid datatype"),QString(tr("The datatype of '%1' (%2) is not valid! \n No signals changed.")).arg(signal.name).arg(signal.datatype));
+             break;
+         }
      }
-
-    m_signals.clear();
-    m_signals = new_signals;
-    emit signalsChanged();
+     if(success){
+        m_signals.clear();
+        m_signals = new_signals;
+        emit signalsChanged();
+     }
     return 0;
+}
+
+QString Signals::validateDatatypes(QString datatype, bool &success){
+    success = true;
+    if(datatype.compare("char")==0 || datatype.compare("int8_t")==0){
+        return "int8_t";
+    }
+    if(datatype.compare("uint8_t")==0){
+        return "uint8_t";
+    }
+    if(datatype.compare("bool")==0){
+        return datatype;
+    }
+    if(datatype.compare("int16_t")==0){
+        return datatype;
+    }
+    if(datatype.compare("uint16_t")==0){
+        return "uint16_t";
+    }
+    if(datatype.compare("int")==0 || datatype.compare("int32_t")==0){
+        return "int32_t";
+    }
+    if(datatype.compare("uint32_t")==0){
+        return datatype;
+    }
+    if(datatype.compare("float")==0){
+        return datatype;
+    }
+    if(datatype.compare("double")==0){
+        return datatype;
+    }
+
+    success = false;
+    return datatype; // not supported datatype detected
 }
 
 void Signals::importSignals(){
