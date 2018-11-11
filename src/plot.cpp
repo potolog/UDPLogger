@@ -297,11 +297,8 @@ void Plot::importSettings(QJsonObject& plot_settings){
         signal_settings.signal_xaxis = signal;
 
         settings.signal_settings.append(signal_settings);
-
-        m_changegpraph_dialog->setSettings(settings);
-
-
     }
+    m_changegpraph_dialog->setSettings(settings);
 }
 
 void Plot::signalsChanged(){
