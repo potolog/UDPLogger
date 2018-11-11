@@ -355,6 +355,7 @@ void Signals::exportUDPFunction(){
     array.append("#ifndef "+tempFileNameHeader+"\n");
     array.append("#define "+tempFileNameHeader+"\n");
     saveFileDefinition.write(array);
+    saveFileDefinition.write("#include <stdint.h> \n");
 
     // create arguments list
     struct input_arguments udp_buffer;
