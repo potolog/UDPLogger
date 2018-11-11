@@ -44,6 +44,7 @@ void ExportData::run(){
 
         if(m_path.isEmpty()){
             emit showInfoMessage(tr("No output path!"),tr("Please define export path in the Settings to use the trigger!"));
+            emit resultReady();
             return;
         }
         QString date = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
