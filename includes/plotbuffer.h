@@ -35,8 +35,13 @@ public:
     void addData(char* data, int length);
     static inline float* getFloatPointer(int position,char* data){return (float*)(&data[position]);}
     static inline double* getDoublePointer(int position,char* data){return (double*)(&data[position]);}
+    static inline int16_t* getShortPointer(int position,char* data){return (int16_t*)(&data[position]);}
+    static inline uint16_t* getUShortPointer(int position,char* data){return (uint16_t*)(&data[position]);}
     static inline char* getCharPointer(int position,char* data){return &data[position];}
+    static inline uint8_t* getUCharPointer(int position,char* data){return (uint8_t*)(&data[position]);}
+    static inline bool* getBoolPointer(int position,char* data){return (bool*)(&data[position]);}
     static inline int* getIntPointer(int position,char* data){return (int*)(&data[position]);}
+    static inline uint32_t* getUIntPointer(int position,char* data){return (uint32_t*)(&data[position]);}
     static double getValue(char* data, int length, struct Signal signal);
 public slots:
     void plotBufferSizeChanged(int plot_buffer_size);

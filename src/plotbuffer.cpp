@@ -81,15 +81,44 @@ double PlotBuffers::getValue(char* data, int length, struct Signal signal){
             return *getDoublePointer(signal.offset,data);
         }
 
-    }else if(signal.datatype.compare("char")==0){
+    }else if(signal.datatype.compare("int8_t")==0){
         if(length > signal.offset){
             char temp = *getCharPointer(signal.offset,data);
             return static_cast<double>(temp);
         }
 
-    }else if(signal.datatype.compare("int")==0){
+    }else if(signal.datatype.compare("uint8_t")==0){
+        if(length > signal.offset){
+            uint8_t temp = *getUCharPointer(signal.offset,data);
+            return static_cast<double>(temp);
+        }
+
+    }else if(signal.datatype.compare("int16_t")==0){
+        if(length > signal.offset+2-1){
+            int16_t temp = *getShortPointer(signal.offset,data);
+            return static_cast<double>(temp);
+        }
+
+    }else if(signal.datatype.compare("uint16_t")==0){
+        if(length > signal.offset+2-1){
+            uint16_t temp = *getUShortPointer(signal.offset,data);
+            return static_cast<double>(temp);
+        }
+
+    }else if(signal.datatype.compare("bool")==0){
+        if(length > signal.offset){
+            bool temp = *getBoolPointer(signal.offset,data);
+            return static_cast<double>(temp);
+        }
+
+    }else if(signal.datatype.compare("int32_t")==0){
         if(length > signal.offset+4-1){
             int temp = *getIntPointer(signal.offset,data);
+            return static_cast<double>(temp);
+        }
+    }else if(signal.datatype.compare("uint32_t")==0){
+        if(length > signal.offset+4-1){
+            int temp = *getUIntPointer(signal.offset,data);
             return static_cast<double>(temp);
         }
     }else{

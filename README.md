@@ -7,6 +7,17 @@ Features:
 - adding dynamically new plots
 - x Axis values can be choosen
 
+Supported signal types:
+- char / int8_t
+- uint8_t
+- bool
+- int16_t
+- uint16_t
+- int / int32_t
+- uint32_t
+- float
+- double
+
 ![alt text](https://github.com/Murmele/UDPLogger/blob/master/res/images/MainView.png)
 
 TODO:
