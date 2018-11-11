@@ -342,9 +342,11 @@ void Signals::exportUDPFunction(){
     QVector<QString> includes;
     includes.append("#include <string.h>\n");
     includes.append("#include <"+fileNameHeader.split("/")[fileNameHeader.split("/").length()-1]+">\n");
-    QStringList additional_includes = m_additional_includes.split(";");
-    foreach(QString include, additional_includes){
-       includes.append("#include <"+include+">\n");
+    if(!m_additional_includes.isEmpty()){
+        QStringList additional_includes = m_additional_includes.split(";");
+        foreach(QString include, additional_includes){
+           includes.append("#include <"+include+">\n");
+        }
     }
 
     QByteArray array;
@@ -356,7 +358,7 @@ void Signals::exportUDPFunction(){
 
     // create arguments list
     struct input_arguments udp_buffer;
-    udp_buffer.datatype = "char*";
+    udp_buffer.datatype = "char* ";
     udp_buffer.variable_name = "udp_buffer";
     arguments.append(udp_buffer);
     struct input_arguments buffer_length;
@@ -379,15 +381,12 @@ void Signals::exportUDPFunction(){
         struct input_arguments argument = arguments[i];
 
         QString const_prefix;
-        QString reference;
         if(i==0){
             const_prefix = "";
-            reference = " ";
         }else{
             const_prefix = "const ";
-            reference = "* ";
         }
-        array.append(QString(const_prefix+argument.datatype+reference+argument.variable_name).toUtf8());
+        array.append(QString(const_prefix+argument.datatype+argument.variable_name).toUtf8());
         if(i<arguments.size()-1){
             array.append(", ");
         }
@@ -404,6 +403,8 @@ void Signals::exportUDPFunction(){
         saveFileDeclaration.write(QString("\t"+memcpy).toUtf8());
     }
 
+   saveFileDeclaration.write("\treturn 0;\n"); // successfully packaged
+
    saveFileDeclaration.write("}");
    saveFileDeclaration.close();
 
@@ -412,14 +413,12 @@ void Signals::exportUDPFunction(){
    array.append("#endif //"+ tempFileNameHeader);
    saveFileDefinition.write(array);
    saveFileDefinition.close();
-
-
 }
 
 QString Signals::ifConditionBuffersize(struct input_arguments buffer_length_variable){
     int length = calculateMinBufferLength(); // length in byte
 
-    QString condition = "\tif("+QString::number(length) + "<=" +"*"+ buffer_length_variable.variable_name + "){\n";
+    QString condition = "\tif("+QString::number(length) + ">" + buffer_length_variable.variable_name + "){\n";
     condition += "\t\t return -1;\n";
     condition += "\t}\n";
     return condition;
@@ -464,7 +463,7 @@ bool Signals::isStruct(QString variable_name){
 
 bool Signals::ifStructNameExist(const QVector<input_arguments>& arguments, QString struct_name, bool& ifstruct){
     for (auto argument : arguments){
-        if (argument.datatype.compare("struct "+struct_name)== 0){
+        if (argument.datatype.compare("struct "+struct_name+"* ")== 0){
             ifstruct = true;
             return 1;
         }
@@ -487,9 +486,9 @@ void Signals::getInputArguments(QVector<struct input_arguments>& arguments){
         }
 
         if(ifstruct){
-            argument.datatype = "struct "+signal.struct_name;
+            argument.datatype = "struct "+signal.struct_name +"* ";
         }else{
-            argument.datatype = signal.datatype;
+            argument.datatype = signal.datatype+ " ";
         }
         argument.variable_name = signal.name.split(".")[0]; // first is the highest struct name
         arguments.append(argument);
