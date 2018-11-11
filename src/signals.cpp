@@ -386,7 +386,7 @@ void Signals::exportUDPFunction(){
         }else{
             const_prefix = "const ";
         }
-        array.append(QString(const_prefix+argument.datatype+argument.variable_name).toUtf8());
+        array.append(QString(const_prefix+argument.datatype+" "+argument.variable_name).toUtf8());
         if(i<arguments.size()-1){
             array.append(", ");
         }
@@ -444,7 +444,7 @@ void Signals::createMemcpyStrings(QVector<QString>& memcpy_strings){
         pointer = "pointer += " + QString::number(signal.offset)+";\n";
         memcpy_strings.append(pointer);
         if(!isStruct(signal.name)){
-            memcpy = prefix+"pointer, "+ signal.name+", sizeof(*"+signal.name+")"+postfix;
+            memcpy = prefix+"pointer, "+"&"+ signal.name+", sizeof("+signal.name+")"+postfix;
         }else{
             QString temp = signal.name;
             temp.replace(temp.indexOf("."),1,"->");
@@ -463,7 +463,7 @@ bool Signals::isStruct(QString variable_name){
 
 bool Signals::ifStructNameExist(const QVector<input_arguments>& arguments, QString struct_name, bool& ifstruct){
     for (auto argument : arguments){
-        if (argument.datatype.compare("struct "+struct_name+"* ")== 0){
+        if (argument.datatype.compare("struct "+struct_name+"*")== 0){
             ifstruct = true;
             return 1;
         }
@@ -486,9 +486,9 @@ void Signals::getInputArguments(QVector<struct input_arguments>& arguments){
         }
 
         if(ifstruct){
-            argument.datatype = "struct "+signal.struct_name +"* ";
+            argument.datatype = "struct "+signal.struct_name +"*";
         }else{
-            argument.datatype = signal.datatype+ " ";
+            argument.datatype = signal.datatype;
         }
         argument.variable_name = signal.name.split(".")[0]; // first is the highest struct name
         arguments.append(argument);
