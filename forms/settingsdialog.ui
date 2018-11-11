@@ -29,36 +29,6 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
-      <string>Export Data</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <item>
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Path</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="txt_export_path"/>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_browse_export_file">
-          <property name="text">
-           <string>Browse File</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>UDP Connection</string>
@@ -131,21 +101,79 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Export Data</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Path</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_export_path"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_browse_export_file">
+          <property name="text">
+           <string>Browse File</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Additional includes:&lt;/p&gt;&lt;p&gt;(seperate with ';')&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="txt_additional_includes"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_10">
        <property name="text">
-        <string>Plot Buffer Size [Elements]</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relativ path from header file&lt;/p&gt;&lt;p&gt;to declaration file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="spinbox_plot_buffer">
+      <widget class="QLineEdit" name="txt_relative_header_path"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>Use Element [every X Element]</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="spinbox_use_element_count">
        <property name="decimals">
         <number>0</number>
        </property>
-       <property name="minimum">
-        <double>1.000000000000000</double>
+       <property name="maximum">
+        <double>2147483647.000000000000000</double>
        </property>
       </widget>
      </item>
@@ -173,37 +201,23 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_9">
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLabel" name="label_9">
+      <widget class="QLabel" name="label">
        <property name="text">
-        <string>Use Element [every X Element]</string>
+        <string>Plot Buffer Size [Elements]</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDoubleSpinBox" name="spinbox_use_element_count">
+      <widget class="QDoubleSpinBox" name="spinbox_plot_buffer">
        <property name="decimals">
         <number>0</number>
        </property>
-       <property name="maximum">
-        <double>2147483647.000000000000000</double>
+       <property name="minimum">
+        <double>1.000000000000000</double>
        </property>
       </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_10">
-     <item>
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relativ path from header file&lt;/p&gt;&lt;p&gt;to declaration file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="txt_relative_header_path"/>
      </item>
     </layout>
    </item>

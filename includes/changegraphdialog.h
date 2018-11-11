@@ -39,8 +39,8 @@ struct SignalSettings{
     int linestyle;
     int scatterstyle;
     struct Signal signal_yaxis;
-    QString name;
     struct Signal signal_xaxis;
+    QString name;
 };
 
 namespace Ui {
@@ -63,6 +63,7 @@ public:
     double yMax(){return m_settings_new.ymax;}
     double automaticRange(){return m_settings_new.automatic_value;}
     void setSettings(struct Settings& settings);
+    void disableSignalSettings(bool disable);
 
     ~changeGraphDialog();
 signals:

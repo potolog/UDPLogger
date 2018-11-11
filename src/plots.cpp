@@ -50,7 +50,7 @@ Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent
     connect(this, &Plots::disconnectToReadyRead, m_udp, &UDP::disconnectDataReady, Qt::ConnectionType::QueuedConnection);
     qRegisterMetaType<QHostAddress>("QHostAddress"); // register QHostAddress to be usable in signal/slots
     connect(this, &Plots::initUDP, m_udp, qOverload<QHostAddress, quint16, int,int,int, QString, QString>(&UDP::init), Qt::ConnectionType::QueuedConnection);
-    connect(this, &Plots::changeRelativeHeaderPath, signal, &Signals::changeRelativeHeaderPath);
+    connect(this, &Plots::changeSignalSettings, signal, &Signals::changeSignalSettings);
 
     connect(this, &Plots::plotBufferSizeChanged, m_data_buffers, &PlotBuffers::plotBufferSizeChanged);
 
@@ -105,18 +105,8 @@ void Plots::exportSettings(){
      }
     object["Plots"] = plots;
 
-    QJsonArray active_signals;
-    for (int i=0; i< m_signals->getSignalCount();i++){
-        QJsonObject signal;
-        signal["Datatype"] = m_signals->getSignal(i).datatype;
-        signal["Index"] = m_signals->getSignal(i).index;
-        signal["Offset"]  = m_signals->getSignal(i).offset;
-        signal["Signalname"]  = m_signals->getSignal(i).name;
-        active_signals.append(signal);
-    }
-    object["Signals"] = active_signals;
 
-
+    m_signals->writeToJsonObject(object);
 
     QJsonObject settings;
     m_settings_dialog->createJSONObject(settings);
@@ -167,22 +157,10 @@ void Plots::importSettings(){
 
     QJsonObject object = d.object();
 
-    if(object.contains("Signals")){
-        QJsonArray used_signals = object["Signals"].toArray();
-        QVector<struct Signal> signal_vector;
-        struct Signal signal_element;
+    // signals
+    m_signals->parseJsonObject(object);
 
-        for(int i=0; i<used_signals.count(); i++){
-            QJsonObject signal = used_signals[i].toObject();
-            signal_element.datatype = signal["Datatype"].toString();
-            signal_element.index = signal["Index"].toInt();
-            signal_element.offset = signal["Offset"].toInt();
-            signal_element.name = signal["Signalname"].toString();
-            signal_vector.append(signal_element);
-        }
-        m_signals->setSignals(&signal_vector);
-    }
-
+    // plot settings
     if(object.contains("Plots")){
         QJsonArray plots = object["Plots"].toArray();
 
@@ -194,6 +172,7 @@ void Plots::importSettings(){
         }
     }
 
+    // global settings
     if(object.contains("Settings") && object.contains("ProjectName")){
         QJsonObject settings;
         settings = object["Settings"].toObject();
@@ -236,13 +215,13 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path, QString additional_includes){
     m_project_name = project_name;
     m_hostaddress = hostname;
     m_port = port;
     m_refresh_rate = refresh_rate;
     m_use_data_count = use_data_count;
-    changeRelativeHeaderPath(relative_header_path);
+    emit changeSignalSettings(relative_header_path, additional_includes);
     emit plotBufferSizeChanged(plot_buffersize);
     emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,refresh_rate, use_data_count, export_path,project_name);
 }

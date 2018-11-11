@@ -29,6 +29,7 @@ struct Signal{
     QString unit;
     int offset; // in receive Byte
     int index;
+    QString struct_name;
 };
 
 struct input_arguments{
@@ -49,15 +50,21 @@ public:
     int importXLSX(QString filename);
     bool isStruct(QString variablename);
     QString validateDatatypes(QString datatype, bool &success);
+    void parseJsonObject(QJsonObject &object);
+    void writeToJsonObject(QJsonObject &object);
+    int calculateMinBufferLength();
+    QString ifConditionBuffersize(input_arguments buffer_length_variable);
+    int calculateDatatypeSize(QString datatype);
 private:
-    bool ifVariableNameExist(const QVector<struct input_arguments>& arguments, QString variable_name, bool& ifstruct);
+    bool ifStructNameExist(const QVector<struct input_arguments>& arguments, QString struct_name, bool& ifstruct);
     void getInputArguments(QVector<struct input_arguments>& arguments);
     void createMemcpyStrings(QVector<QString> &memcpy_strings);
 
 public slots:
     void importSignals();
     void exportUDPFunction();
-    void changeRelativeHeaderPath(QString relative_header_path);
+    void changeSignalSettings(QString relative_header_path, QString additional_includes);
+    bool signalExist(struct Signal signal_to_match) const;
 
 signals:
     void signalsChanged();
@@ -66,6 +73,7 @@ signals:
 private:
    QVector<struct Signal> m_signals;
    QString m_header_path;
+   QString m_additional_includes;
    QString m_c_path;
 };
 

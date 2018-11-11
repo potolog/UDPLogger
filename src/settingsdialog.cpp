@@ -89,6 +89,7 @@ void SettingsDialog::accepted(){
     bool export_data;
     int use_data_count;
     QString relative_header_path;
+    QString additional_includes;
 
     udp_buffersize = static_cast<int>(ui->spinbox_udp_buffer->value());
     plot_buffersize = static_cast<int>(ui->spinbox_plot_buffer->value());
@@ -100,8 +101,9 @@ void SettingsDialog::accepted(){
     QHostAddress hostname(ui->txt_hostaddress->text());
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
+    additional_includes = ui->txt_additional_includes->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, port,refresh_rate, use_data_count, export_filename,relative_header_path);
+    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, port,refresh_rate, use_data_count, export_filename,relative_header_path, additional_includes);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -127,6 +129,7 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["RefreshRate"] = static_cast<int>(ui->spinbox_refresh_rate->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
     object["relative_header_path"] = ui->txt_relative_header_path->text();
+    object["additionalIncludes"] = ui->txt_additional_includes->text();
 }
 
 void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
@@ -141,7 +144,7 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
     ui->spinbox_port->setValue(static_cast<double>(network_settings["Port"].toInt()));
     ui->spinbox_udp_buffer->setValue(static_cast<double>(network_settings["UDPPufferSize"].toInt()));
 
-
+    ui->txt_additional_includes->setText(object["additionalIncludes"].toString());
     ui->txt_project_name->setText(project_name);
     ui->txt_export_path->setText(object["ExportDataFile"].toString());
 

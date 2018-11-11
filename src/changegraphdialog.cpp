@@ -74,14 +74,7 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
 
     updateSignals();
 
-    if (ui->listWidget->count() <= 0){
-        ui->combo_color->setEnabled(false);
-        ui->combo_linestyle->setEnabled(false);
-        ui->combo_scatter_style->setEnabled(false);
-        ui->txt_name->setEnabled(false);
-        ui->combo_signalname->setEnabled(false);
-        ui->combo_signalname_xaxis->setEnabled(false);
-    }
+    disableSignalSettings(true);
 
     m_previous_row = -1;
 
@@ -112,6 +105,16 @@ changeGraphDialog::changeGraphDialog(Plot *parent_plot, QWidget* parent, Signals
 
 
 }
+
+void changeGraphDialog::disableSignalSettings(bool disable){
+    ui->combo_color->setEnabled(!disable);
+    ui->combo_linestyle->setEnabled(!disable);
+    ui->combo_scatter_style->setEnabled(!disable);
+    ui->txt_name->setEnabled(!disable);
+    ui->combo_signalname->setEnabled(!disable);
+    ui->combo_signalname_xaxis->setEnabled(!disable);
+}
+
 void changeGraphDialog::listWidgetRowChanged(int row){
 
     if(row <0){
@@ -203,8 +206,8 @@ void changeGraphDialog::apply(){
         m_settings_new.signal_settings[row].linestyle = ui->combo_linestyle->currentData().toInt();
         m_settings_new.signal_settings[row].scatterstyle = ui->combo_scatter_style->currentData().toInt();
         m_settings_new.signal_settings[row].name = ui->txt_name->toPlainText();
-        m_settings_new.signal_settings[row].signal_yaxis = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
         m_settings_new.signal_settings[row].signal_xaxis = m_signals->getSignal(ui->combo_signalname_xaxis->currentData().toInt());
+        m_settings_new.signal_settings[row].signal_yaxis = m_signals->getSignal(ui->combo_signalname->currentData().toInt());
         m_settings_new.ymin = ui->spinbox_y_min->value();
         m_settings_new.ymax = ui->spinbox_y_max->value();
         m_settings_new.automatic_value = ui->spinbox_range_adjustment->value();
@@ -234,11 +237,15 @@ void changeGraphDialog::deleteElement(){
     m_previous_row = -1;
     delete item;
     struct Signal xaxis = m_settings_old.signal_settings.at(row).signal_xaxis;
-    struct Signal yaxis = m_settings_new.signal_settings.at(row).signal_yaxis;
+    struct Signal yaxis = m_settings_old.signal_settings.at(row).signal_yaxis;
     m_settings_old.signal_settings.remove(row);
     m_settings_new.signal_settings.remove(row);
 
     m_parent->deleteGraph(xaxis, yaxis,row);
+
+    if(ui->listWidget->count() <= 0){
+        disableSignalSettings(true);
+    }
 }
 
 void changeGraphDialog::addElement(){
@@ -300,12 +307,7 @@ void changeGraphDialog::addElement(struct SignalSettings* settings_import=nullpt
     ui->combo_signalname->setCurrentText(settings.signal_yaxis.name);
     ui->combo_signalname_xaxis->setCurrentText(settings.signal_xaxis.name);
 
-    ui->combo_color->setEnabled(true);
-    ui->combo_linestyle->setEnabled(true);
-    ui->combo_scatter_style->setEnabled(true);
-    ui->txt_name->setEnabled(true);
-    ui->combo_signalname->setEnabled(true);
-    ui->combo_signalname_xaxis->setEnabled(true);
+    disableSignalSettings(false);
 }
 
 void changeGraphDialog::updateSignals(){
@@ -317,6 +319,33 @@ void changeGraphDialog::updateSignals(){
         ui->combo_signalname->addItem(signal_temp.name,i);
         ui->combo_signalname_xaxis->addItem(signal_temp.name,i);
     }
+
+    if(m_settings_old.signal_settings.length() <1){
+        return;
+    }
+    // delete all signals if signal for x axis does not exist
+    if(!m_signals->signalExist(m_settings_old.signal_settings.at(0).signal_xaxis)){
+        for(int i=0; i< ui->listWidget->count(); i++){
+            ui->listWidget->setCurrentRow(0);
+            deleteElement();
+        }
+        return;
+    }
+
+    // delete all signals where the signal does not exist anymore
+    int i = 0;
+    while(ui->listWidget->currentRow() != ui->listWidget->count()){
+        if(i >= m_settings_old.signal_settings.length()){
+            break;
+        }
+        if(!m_signals->signalExist(m_settings_old.signal_settings.at(i).signal_yaxis)){
+            ui->listWidget->setCurrentRow(i);
+            deleteElement();
+            continue;
+        }
+        i++;
+    }
+
 }
 
 changeGraphDialog::~changeGraphDialog()
