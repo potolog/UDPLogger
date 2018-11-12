@@ -73,6 +73,7 @@ void Plot::deleteGraph(struct Signal xaxis, struct Signal yaxis, int index){
     removeGraph(graph(index));
 
     m_parent->removeGraph(xaxis, yaxis);
+    replot();
 }
 
 void Plot::newGraph(struct SignalSettings settings){
