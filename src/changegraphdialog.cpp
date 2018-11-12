@@ -325,7 +325,8 @@ void changeGraphDialog::updateSignals(){
     }
     // delete all signals if signal for x axis does not exist
     if(!m_signals->signalExist(m_settings_old.signal_settings.at(0).signal_xaxis)){
-        for(int i=0; i< ui->listWidget->count(); i++){
+        int count = ui->listWidget->count();
+        for(int i=0; i< count; i++){
             ui->listWidget->setCurrentRow(0);
             deleteElement();
         }
