@@ -311,6 +311,13 @@ void Plot::signalsChanged(){
 
 Plot::~Plot(){
     m_menu->close();
+
+    struct Settings settings = m_changegpraph_dialog->getSettings();
+
+    foreach(struct SignalSettings signal_settings, settings.signal_settings){
+        removeSignal(signal_settings.signal_xaxis, signal_settings.signal_yaxis);
+    }
+
     delete m_changegpraph_dialog;
     delete m_menu;
 }
