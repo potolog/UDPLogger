@@ -92,7 +92,7 @@ void Plot::changeGraphSettings(int index_graph, struct SignalSettings new_settin
     QSharedPointer<QCPGraphDataContainer> data_puffer = m_parent->getBuffer(new_settings.signal_xaxis, new_settings.signal_yaxis);
     // problem: durch das ersetzen der alten daten, wird der alte shared pointer gelöscht, aber der wurde ja bereits durch remove signals gelöscht
     graph(index_graph)->setData(data_puffer);
-    graph(index_graph)->setName(new_settings.name);
+    graph(index_graph)->setName(new_settings.name + " ["+new_settings.signal_yaxis.unit + "]");
 
     if(remove_signal && new_settings.signal_xaxis.index != old_settings.signal_xaxis.index &&
             new_settings.signal_yaxis.index != old_settings.signal_yaxis.index){
