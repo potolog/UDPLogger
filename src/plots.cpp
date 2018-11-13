@@ -234,13 +234,10 @@ void Plots::showInfoMessageBox(QString title, QString text){
 
 Plots::~Plots(){
 
-    // before importing remove everything!!!!
-    int size = m_plots.size();
-    for (int i=0; i<size; i++){
-        deletePlot(0);
+    int size = m_plots.length();
+    for(int i=0; i<size; i++){
+        deletePlot(m_plots.at(0));
     }
-
-
     m_udp_thread.quit();
     m_udp_thread.wait(); // waiting till thread quits
     delete m_udp;
