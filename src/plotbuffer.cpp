@@ -157,3 +157,9 @@ void PlotBuffers::addData(char* data, int length){
         }
     }
 }
+
+void PlotBuffers::clearPlots(){
+    for(int i=0; i< m_plot_buffer.length(); i++){
+        m_plot_buffer[i].data()->clear();
+    }
+}

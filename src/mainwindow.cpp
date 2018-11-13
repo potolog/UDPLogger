@@ -93,6 +93,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_stop_udp, &QAction::triggered, this, &MainWindow::disableStopUDP);
     ui->menuBar->addAction(m_stop_udp);
 
+    QAction *clearPlotBuffer = new QAction(tr("Clear plot buffer"), this);
+    clearPlotBuffer->setStatusTip(tr("Clearing the plot buffer to plot new data, where the keys are smaller than the last keys."));
+    connect(clearPlotBuffer, &QAction::triggered, m_plots, &Plots::clearPlots);
+    ui->menuBar->addAction(clearPlotBuffer);
+
     QAction *settings_widget = new QAction(tr("Settings"), this);
     connect(settings_widget, &QAction::triggered, m_plots, &Plots::settings);
     ui->menuBar->addAction(settings_widget);

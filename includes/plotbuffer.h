@@ -43,6 +43,7 @@ public:
     static inline int* getIntPointer(int position,char* data){return (int*)(&data[position]);}
     static inline uint32_t* getUIntPointer(int position,char* data){return (uint32_t*)(&data[position]);}
     static double getValue(char* data, int length, struct Signal signal);
+    void clearPlots();
 public slots:
     void plotBufferSizeChanged(int plot_buffer_size);
     void removeSignal(struct Signal xaxis, struct Signal yaxis);

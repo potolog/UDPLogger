@@ -57,6 +57,7 @@ public slots:
     void stopUDP();
     void settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path, QString additional_includes);
     void showInfoMessageBox(QString title, QString text);
+    void clearPlots();
 signals:
     void startUDPReadData();
     void connectToReadyRead();

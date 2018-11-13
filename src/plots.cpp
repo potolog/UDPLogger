@@ -232,6 +232,15 @@ void Plots::showInfoMessageBox(QString title, QString text){
     msgBox.exec();
 }
 
+void Plots::clearPlots(){
+    m_mutex->lock();
+    m_data_buffers->clearPlots();
+    m_mutex->unlock();
+    for(int i=0; i<m_plots.length();i++){
+        m_plots[i]->replot();
+    }
+}
+
 Plots::~Plots(){
 
     int size = m_plots.length();
