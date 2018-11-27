@@ -243,6 +243,7 @@ void Plot::writeJSON(QJsonObject &object){
         signal["Signalname"] = signalsettings.signal_yaxis.name;
         signal["Offset"] = signalsettings.signal_yaxis.offset;
         signal["structName"] = signalsettings.signal_yaxis.struct_name;
+		signal["unit"] = signalsettings.signal_yaxis.unit;
         graph["Signal yAxis"] = signal;
 
         signal["Datatype"] = signalsettings.signal_xaxis.datatype;
@@ -250,6 +251,7 @@ void Plot::writeJSON(QJsonObject &object){
         signal["Signalname"] = signalsettings.signal_xaxis.name;
         signal["Offset"] = signalsettings.signal_xaxis.offset;
         signal["structName"] = signalsettings.signal_xaxis.struct_name;
+		signal["unit"] = signalsettings.signal_xaxis.unit;
         graph["Signal xAxis"] = signal;
 
         graphs.append(graph);
@@ -291,6 +293,7 @@ void Plot::importSettings(QJsonObject& plot_settings){
         signal.offset = signalsettings["Offset"].toInt();
         signal.name = signalsettings["Signalname"].toString();
         signal.struct_name = signalsettings["structName"].toString();
+		signal.unit = signalsettings["unit"].toString();
         signal_settings.signal_yaxis = signal;
 
         signalsettings = graph["Signal xAxis"].toObject();
@@ -299,6 +302,7 @@ void Plot::importSettings(QJsonObject& plot_settings){
         signal.offset = signalsettings["Offset"].toInt();
         signal.name = signalsettings["Signalname"].toString();
         signal.struct_name = signalsettings["structName"].toString();
+		signal.unit = signalsettings["unit"].toString();
         signal_settings.signal_xaxis = signal;
 
         settings.signal_settings.append(signal_settings);
