@@ -135,17 +135,19 @@ void Plots::importSettings(){
         return;
     }
 
+	QString fileName = QFileDialog::getOpenFileName(this,
+		tr("Open settingsfile"), "/home", tr("UDP Logger Config Files (*.udpLoggerSettings)"));
+
+	if(fileName.compare("")==0)
+		return;
+
     // before importing remove everything!!!!
     int size = m_plots.size();
     for (int i=0; i<size; i++){
         deletePlot(m_plots.at(0));
     }
 
-    QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Open settingsfile"), "/home", tr("UDP Logger Config Files (*.udpLoggerSettings)"));
 
-    if(fileName.compare("")==0)
-        return;
 
     QFile file;
     file.setFileName(fileName);
