@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>747</width>
-    <height>621</height>
+    <height>627</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -295,8 +295,11 @@
               <layout class="QHBoxLayout" name="horizontalLayout_9">
                <item>
                 <widget class="QDoubleSpinBox" name="spinbox_range_adjustment">
+                 <property name="decimals">
+                  <number>10</number>
+                 </property>
                  <property name="maximum">
-                  <double>1000.000000000000000</double>
+                  <double>100000000.000000000000000</double>
                  </property>
                  <property name="value">
                   <double>100.000000000000000</double>
