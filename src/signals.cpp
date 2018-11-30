@@ -208,12 +208,12 @@ int Signals::importXLSX(QString filename){
      for(unsigned long i=description_row+1; i< theWholeSpreadSheet.size(); i++){
          struct Signal signal;
          signal.datatype = validateDatatypes(QString::fromStdString(theWholeSpreadSheet.at(i).at(datatype_column)),success);
-         if(!success){
+		 signal.name = QString::fromStdString(theWholeSpreadSheet.at(i).at(name_column));
+		 if(!success){
              success = false;
              emit showMessageBox(tr("No valid datatype"),QString(tr("The datatype of '%1' (%2) is not valid! \n No signals changed.")).arg(signal.name).arg(signal.datatype));
              break;
          }
-         signal.name = QString::fromStdString(theWholeSpreadSheet.at(i).at(name_column));
          signal.index = std::stoi(theWholeSpreadSheet.at(i).at(index_column));
          signal.offset = offset;
          signal.unit = QString::fromStdString(theWholeSpreadSheet.at(i).at(unit_name_column));
