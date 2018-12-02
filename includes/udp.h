@@ -69,6 +69,7 @@ signals:
     void dataChanged();
     void showInfoMessageBox(QString title, QString text);
     void disableTrigger();
+	void newTriggerValue(double value);
 
 private:
     int m_actual_index;
@@ -112,6 +113,8 @@ private:
 
     ExportData* m_export;
     int64_t m_time_difference;
+
+	double m_actual_value;
 
 
 };

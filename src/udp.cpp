@@ -46,10 +46,12 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
     m_trigger_in_progress = false;
 
     m_timer = new QTimer(this);
+	m_actual_value = 0;
 
 
     connect(this, &UDP::triggerFinished, trigger, &TriggerWidget::triggered, Qt::ConnectionType::QueuedConnection);
     connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::BlockingQueuedConnection);
+	connect(this, &UDP::newTriggerValue, trigger, &TriggerWidget::newTriggerValue, Qt::ConnectionType::QueuedConnection);
 	connect(trigger, &TriggerWidget::startTrigger, this, &UDP::startTrigger, Qt::ConnectionType::BlockingQueuedConnection);
 	connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
 
@@ -100,6 +102,7 @@ void UDP::refreshPlot(){
     if(m_data_changed){
         m_data_changed = false;
         emit dataChanged();
+		emit newTriggerValue(m_actual_value);
     }
 }
 
@@ -136,17 +139,22 @@ void UDP::readData(){
     }
 
     m_mutex->unlock();
+
+	if(m_signals->getSignalCount() > 0){
+		m_actual_value = m_data_buffers->getValue(puffer.puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());
+	}
     // Trigger
     if(m_triggerwidget->isTriggerEnabled() && !m_trigger_in_progress){
-        double value = m_data_buffers->getValue(puffer.puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());
-        double trigger_level = m_triggerwidget->getTriggerLevel();
+		double trigger_level = m_triggerwidget->getTriggerLevel();
         TriggerType triggertype = m_triggerwidget->getTriggerType();
         bool triggered = false;
-        if(value > trigger_level && value > m_previous_value && (triggertype == TriggerType::RISING_EDGE || triggertype == TriggerType::ALL_EDGES) ){
+		if(m_actual_value > trigger_level && m_actual_value > m_previous_value && (triggertype == TriggerType::RISING_EDGE || triggertype == TriggerType::ALL_EDGES) ){
             triggered = true;
-        }else if(value < trigger_level && value < m_previous_value && (triggertype == TriggerType::FALLING_EDGE || triggertype == TriggerType::ALL_EDGES)){
+		}else if(m_actual_value < trigger_level && m_actual_value < m_previous_value && (triggertype == TriggerType::FALLING_EDGE || triggertype == TriggerType::ALL_EDGES)){
             triggered = true;
-        }
+		}else{
+			m_previous_value = m_actual_value;
+		}
 
         if(triggered){
 			startTrigger();

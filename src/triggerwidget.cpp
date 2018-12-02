@@ -119,6 +119,9 @@ void TriggerWidget::disableTrigger(){
     ui->checkbox_enable_trigger->setChecked(false);
 }
 
+void TriggerWidget::newTriggerValue(double value){
+	ui->lbl_value->setText(QString::number(value));
+}
 
 void TriggerWidget::on_pb_start_trigger_clicked()
 {
