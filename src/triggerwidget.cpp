@@ -42,7 +42,11 @@ void TriggerWidget::updateSignals(){
 }
 
 struct Signal TriggerWidget::getTriggerSignal(){
-    return m_signals->getSignal(m_signal_index);
+	if(m_signals->getSignalCount()-1 >= m_signal_index){
+		return m_signals->getSignal(m_signal_index);
+	}
+	struct Signal signal;
+	return signal;
 }
 
 double TriggerWidget::getTriggerLevel(){
