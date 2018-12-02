@@ -50,7 +50,8 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 
     connect(this, &UDP::triggerFinished, trigger, &TriggerWidget::triggered, Qt::ConnectionType::QueuedConnection);
     connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::BlockingQueuedConnection);
-    connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
+	connect(trigger, &TriggerWidget::startTrigger, this, &UDP::startTrigger, Qt::ConnectionType::BlockingQueuedConnection);
+	connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
 
 
 
@@ -148,10 +149,7 @@ void UDP::readData(){
         }
 
         if(triggered){
-            QTimer::singleShot(m_triggerwidget->getTimeAfterTrigger()*1000,this,&UDP::timerTimeout);
-            m_trigger_in_progress = true;
-            m_previous_value = value;
-            m_trigger_index = m_udp_global_index;
+			startTrigger();
         }
     }
 
@@ -229,6 +227,13 @@ void UDP::timerTimeout(){
 void UDP::exportFinished(){
     m_export->deleteLater();
     m_trigger_in_progress = false;
+}
+
+void UDP::startTrigger(){
+	QTimer::singleShot(m_triggerwidget->getTimeAfterTrigger()*1000,this,&UDP::timerTimeout);
+	m_trigger_in_progress = true;
+	m_previous_value = m_data_buffers->getValue(m_udp_buffer[m_udp_index].puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());
+	m_trigger_index = m_udp_global_index;
 }
 
 UDP::~UDP(){

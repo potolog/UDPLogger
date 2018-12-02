@@ -52,6 +52,9 @@ private slots:
 
     void on_spinbox_t_after_trigger_valueChanged(double arg1);
 
+	void on_pb_start_trigger_clicked();
+signals:
+	void startTrigger();
 private:
     Ui::TriggerWidget *ui;
     Signals* m_signals;

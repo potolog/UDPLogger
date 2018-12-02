@@ -61,6 +61,7 @@ public slots:
     void timerTimeout();
     void exportFinished();
     void refreshPlot();
+	void startTrigger();
 
 signals:
     void newData();

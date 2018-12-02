@@ -118,3 +118,9 @@ void TriggerWidget::disableTrigger(){
     ui->checkbox_restart_trigger->setChecked(false);
     ui->checkbox_enable_trigger->setChecked(false);
 }
+
+
+void TriggerWidget::on_pb_start_trigger_clicked()
+{
+	emit startTrigger();
+}

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>447</height>
+    <width>460</width>
+    <height>528</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -137,6 +137,13 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pb_start_trigger">
+     <property name="text">
+      <string>Start the trigger immediately</string>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="verticalSpacer">
