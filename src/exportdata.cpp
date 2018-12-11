@@ -23,7 +23,8 @@ ExportData::ExportData(QString path,QString project_name, QVector<struct udp_mes
         if(buffer_index >= m_udp_buffer_size){
             buffer_index=0;// circle buffer
         }
-        m_data[index] = data[i];
+		m_data[index] = data[buffer_index];
+		buffer_index++;
         index ++;
     }
 }
