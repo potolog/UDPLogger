@@ -42,6 +42,8 @@ public:
     static inline bool* getBoolPointer(int position,char* data){return (bool*)(&data[position]);}
     static inline int* getIntPointer(int position,char* data){return (int*)(&data[position]);}
     static inline uint32_t* getUIntPointer(int position,char* data){return (uint32_t*)(&data[position]);}
+	static inline int64_t* getInt64Pointer(int position,char* data){return (int64_t*)(&data[position]);}
+	static inline uint64_t* getUInt64Pointer(int position,char* data){return (uint64_t*)(&data[position]);}
     static double getValue(char* data, int length, struct Signal signal);
     void clearPlots();
 public slots:

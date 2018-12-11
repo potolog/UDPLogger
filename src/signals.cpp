@@ -113,6 +113,12 @@ int Signals::calculateDatatypeSize(QString datatype){
     if(datatype.compare("uint32_t")==0){
         return 4;
     }
+	if(datatype.compare("int64_t")==0){
+		return 8;
+	}
+	if(datatype.compare("uint64_t")==0){
+		return 8;
+	}
     if(datatype.compare("float")==0){
         return 4;
     }
@@ -269,6 +275,12 @@ QString Signals::validateDatatypes(QString datatype, bool &success){
     if(datatype.compare("uint32_t")==0){
         return datatype;
     }
+	if(datatype.compare("uint64_t")==0){
+		return datatype;
+	}
+	if(datatype.compare("int64_t")==0){
+		return datatype;
+	}
     if(datatype.compare("float")==0){
         return datatype;
     }

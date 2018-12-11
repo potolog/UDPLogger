@@ -121,7 +121,18 @@ double PlotBuffers::getValue(char* data, int length, struct Signal signal){
             int temp = *getUIntPointer(signal.offset,data);
             return static_cast<double>(temp);
         }
-    }else{
+	}else if(signal.datatype.compare("uint64_t")==0){
+		if(length > signal.offset+8-1){
+			int temp = *getUInt64Pointer(signal.offset,data);
+			return static_cast<double>(temp);
+		}
+	}
+	else if(signal.datatype.compare("int64_t")==0){
+			if(length > signal.offset+8-1){
+				int temp = *getInt64Pointer(signal.offset,data);
+				return static_cast<double>(temp);
+			}
+	}else{
         return 0; // not defined
     }
 }
