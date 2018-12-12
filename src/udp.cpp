@@ -209,7 +209,7 @@ void UDP::timerTimeout(){
         }
         index_before = m_trigger_index - static_cast<int>(time_before)/m_time_difference;
     }else{
-        // can be assumed, that index_before don't get an overflow
+		// can be assumed, that index_before don't get an overflow because it is a 64bit variable
         index_before = m_trigger_index - static_cast<int>(time_before/time_after*(m_udp_global_index-m_trigger_index));
     }
 
