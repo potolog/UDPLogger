@@ -31,7 +31,7 @@
 
 
 Signals::Signals(){
-    m_c_path = "";
+	m_c_path = "/home";
     m_header_path = "";
 }
 
@@ -62,6 +62,7 @@ void Signals::writeToJsonObject(QJsonObject &object){
         active_signals.append(signal_object);
     }
     object["Signals"] = active_signals;
+	object["ExportCFunctionPath"] = m_c_path;
 }
 
 void Signals::parseJsonObject(QJsonObject &object){
@@ -91,6 +92,10 @@ void Signals::parseJsonObject(QJsonObject &object){
             setSignals(&signal_vector);
         }
     }
+
+	if(object.contains("ExportCFunctionPath")){
+		m_c_path = object["ExportCFunctionPath"].toString();
+	}
 }
 
 int Signals::calculateDatatypeSize(QString datatype){
@@ -321,7 +326,7 @@ void Signals::exportUDPFunction(){
     QString file_name = tempListPath.last();
     tempListPath.removeLast();
     QString path = tempListPath.join("/");
-    m_c_path = path;
+	m_c_path = pathWithFileName;
 
     QStringList tempList = file_name.split(".");
     QString fileNameHeader = "";
@@ -338,12 +343,12 @@ void Signals::exportUDPFunction(){
        fileNameHeader+= ".h";
     }
 
-    QFile saveFileDefinition(m_c_path+"/"+m_header_path+"/"+fileNameHeader);
+	QFile saveFileDefinition(path+"/"+m_header_path+"/"+fileNameHeader);
     if (!saveFileDefinition.open(QIODevice::WriteOnly)) {
        qWarning("Couldn't open header file.");
     }
 
-    QFile saveFileDeclaration(m_c_path+"/"+fileNameDeclaration);
+	QFile saveFileDeclaration(path+"/"+fileNameDeclaration);
     if (!saveFileDeclaration.open(QIODevice::WriteOnly)) {
        qWarning("Couldn't open c/cpp file.");
     }
