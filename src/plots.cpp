@@ -34,6 +34,7 @@ Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent
     m_index_new_data = 0;
     m_ifudpLogging = false;
     m_use_data_count = 0;
+	m_export_filename = "/home";
 
     m_data_buffers = new PlotBuffers(signal);
 
@@ -86,11 +87,13 @@ void Plots::exportSettings(){
     QFileDialog filedialog;
     filedialog.setDefaultSuffix(".udpLoggerSettings");
     QString fileName = filedialog.getSaveFileName(this,
-            tr("Export Settings"), "/home",
+			tr("Export Settings"), m_export_filename,
             select,&select);
 
     if(fileName.compare("") == 0)
         return;
+
+	m_export_filename = fileName;
     QJsonObject object;
 
     object["ProjectName"] = m_project_name;
@@ -136,11 +139,12 @@ void Plots::importSettings(){
     }
 
 	QString fileName = QFileDialog::getOpenFileName(this,
-		tr("Open settingsfile"), "/home", tr("UDP Logger Config Files (*.udpLoggerSettings)"));
+		tr("Open settingsfile"), m_export_filename, tr("UDP Logger Config Files (*.udpLoggerSettings)"));
 
 	if(fileName.compare("")==0)
 		return;
 
+	m_export_filename = fileName;
     // before importing remove everything!!!!
     int size = m_plots.size();
     for (int i=0; i<size; i++){
