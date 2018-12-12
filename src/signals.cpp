@@ -58,6 +58,7 @@ void Signals::writeToJsonObject(QJsonObject &object){
         signal_object["Offset"]  = signal.offset;
         signal_object["Signalname"]  = signal.name;
         signal_object["structName"] = signal.struct_name;
+		signal_object["Unit"] = signal.unit;
         active_signals.append(signal_object);
     }
     object["Signals"] = active_signals;
@@ -76,6 +77,7 @@ void Signals::parseJsonObject(QJsonObject &object){
             signal_element.index = signal["Index"].toInt();
             signal_element.offset = signal["Offset"].toInt();
             signal_element.name = signal["Signalname"].toString();
+			signal_element.unit = signal["Unit"].toString();
             signal_element.struct_name = signal["structName"].toString();
             signal_vector.append(signal_element);
             if(signal_element.datatype.compare("")==0){
