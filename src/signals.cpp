@@ -445,6 +445,9 @@ QString Signals::ifConditionBuffersize(struct input_arguments buffer_length_vari
 }
 
 int Signals::calculateMinBufferLength(){
+	if(m_signals.isEmpty())
+		return 0;
+
     struct Signal signal = m_signals.at(m_signals.length()-1);
 
     int offset = signal.offset + calculateDatatypeSize(signal.datatype);
