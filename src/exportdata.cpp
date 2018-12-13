@@ -21,7 +21,7 @@ ExportData::ExportData(QString path,QString project_name, QVector<struct udp_mes
     int buffer_index = start_index;
     for(int i=0; i< (m_last - m_first); i++){ // m_first can be negative, so subtraction is possible
         if(buffer_index >= m_udp_buffer_size){
-            buffer_index=0;// circle buffer
+			buffer_index= buffer_index % m_udp_buffer_size;
         }
 		m_data[index] = data[buffer_index];
 		buffer_index++;
