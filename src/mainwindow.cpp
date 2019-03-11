@@ -51,10 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     readSettings();
 
-    m_plots = new Plots(ui->centralWidget,m_signal, triggerwidget);
-    m_vlayout->addWidget(m_plots);
-    ui->centralWidget->setLayout(m_vlayout);
-
+	m_plots = new Plots(ui->scrollArea ,m_signal, triggerwidget);
+	ui->scrollArea->setWidget(m_plots);
     QMenu* menu = ui->menuBar->addMenu(tr("&File"));
 
     QAction *export_settings = new QAction(tr("&export Settings"), this);

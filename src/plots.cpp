@@ -30,7 +30,8 @@
 
 Plots::Plots(QWidget *parent, Signals* signal, TriggerWidget* trigger): m_parent(parent), m_signals(signal)
 {
-    m_layout = new QVBoxLayout(parent);
+	m_layout = new QVBoxLayout(this);
+	m_layout->setSizeConstraint(QLayout::SetMinimumSize);
     m_index_new_data = 0;
     m_ifudpLogging = false;
     m_use_data_count = 0;
@@ -192,7 +193,8 @@ Plot* Plots::createNewPlot()
     Plot* plot = new Plot(this, m_parent, m_plots.length(),m_signals);
     connect(plot, &Plot::removeSignal, m_data_buffers, &PlotBuffers::removeSignal);
     m_plots.append(plot);
-    m_layout->addWidget(plot);
+	m_layout->addWidget(plot);
+
     connect(m_udp, &UDP::dataChanged, plot, &Plot::newData);
     connect(m_signals, &Signals::signalsChanged, plot, &Plot::signalsChanged);
     return plot;
