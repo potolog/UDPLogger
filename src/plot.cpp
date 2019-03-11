@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "plotscontextmenu.h"
 #include "changegraphdialog.h"
+#include "changediagramproperties.h"
 
 Plot::Plot(Plots* plots, QWidget* parent, int index, Signals *signal):
     QCustomPlot(parent), m_index(index),m_parent(plots), m_signals(signal)
@@ -45,8 +46,8 @@ Plot::Plot(Plots* plots, QWidget* parent, int index, Signals *signal):
     connect(add_graph, &QAction::triggered, this, &Plot::changeGraphStyle);
     m_menu->addAction(add_graph);
 
-    QAction* clear_plot =new QAction(tr("Plot"),this);
-    connect(clear_plot, &QAction::triggered, this, &Plot::clearPlot);
+	QAction* clear_plot =new QAction(tr("Change Plot"),this);
+	connect(clear_plot, &QAction::triggered, this, &Plot::changePlot);
     m_menu->addAction(clear_plot);
 
     QAction* delete_plot =new QAction(tr("Delete Plot"),this);
@@ -60,6 +61,8 @@ Plot::Plot(Plots* plots, QWidget* parent, int index, Signals *signal):
     m_plot_buffer_index = 0;
 
     legend->setVisible(true);
+
+	setMinimumHeight(100);
 
 }
 
@@ -112,6 +115,18 @@ bool Plot::ifNameExists(QString name){
 
 void Plot::changeGraphStyle(){
     m_changegpraph_dialog->show();
+}
+
+void Plot::changePlot() {
+	ChangeDiagramProperties window(this);
+	window.setProperties(minimumHeight());
+	connect(&window, &ChangeDiagramProperties::heightChanged, this, &Plot::heightChanged);
+	window.exec();
+
+}
+
+void Plot::heightChanged(int height) {
+	setMinimumHeight(height);
 }
 
 void Plot::mousePressEvent(QMouseEvent *ev){
@@ -222,6 +237,7 @@ void Plot::newData(){
 void Plot::writeJSON(QJsonObject &object){
 
     struct Settings settings = m_changegpraph_dialog->getSettings();
+	object["minHeight"] = minimumHeight();
     object["ymin"] = settings.ymin;
     object["ymax"] = settings.ymax;
     object["ifrelative_range"] = settings.ifrelative_ranging;
@@ -268,6 +284,7 @@ void Plot::importSettings(QJsonObject& plot_settings){
     }
     struct Settings settings;
 
+	setMinimumHeight(plot_settings["minHeight"].toInt());
     settings.ymin = plot_settings["ymin"].toDouble();
     settings.ymax = plot_settings["ymax"].toDouble();
     settings.automatic_value = plot_settings["automatic_value"].toDouble();

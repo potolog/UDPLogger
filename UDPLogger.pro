@@ -53,7 +53,8 @@ SOURCES += \
     src/plotbuffer.cpp \
     src/triggerwidget.cpp \
     src/datafile.cpp \
-    src/exportdata.cpp
+    src/exportdata.cpp \
+    src/changediagramproperties.cpp
 
 HEADERS += \
     includes/changegraphdialog.h \
@@ -68,13 +69,15 @@ HEADERS += \
     includes/plotbuffer.h \
     includes/triggerwidget.h \
     includes/datafile.h \
-    includes/exportdata.h
+    includes/exportdata.h \
+    includes/changediagramproperties.h
 
 FORMS += \
     forms/changegraphdialog.ui \
     forms/mainwindow.ui \
     forms/settingsdialog.ui \
-    forms/triggerwidget.ui
+    forms/triggerwidget.ui \
+    forms/changediagramproperties.ui
 
 # Default rules for deployment.
 

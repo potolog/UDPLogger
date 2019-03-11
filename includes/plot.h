@@ -45,6 +45,8 @@ private slots:
     void deletePlot();
     void clearPlot();
     void changeGraphStyle();
+	void changePlot();
+	void heightChanged(int height);
 public slots:
     void newData();
     void signalsChanged();
