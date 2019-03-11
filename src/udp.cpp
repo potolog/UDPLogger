@@ -83,10 +83,7 @@ bool UDP::init(QHostAddress hostaddress, quint16 port, int udp_buffer_size, int 
     m_udp_global_index = 0;
 
     if (!m_socket->bind(hostaddress, port)){
-        QMessageBox msgBox;
-
-        msgBox.setText("Hostaddress or Port not valid: "+m_socket->errorString());
-        msgBox.exec();
+		emit showInfoMessageBox(tr("Not able to open UDP"),QString(tr("Hostaddress or Port not valid: '%1'\nMaybe a second instance of UDPLogger is open?")).arg(m_socket->errorString()));
         std::cout << "Bind: NOK" << std::endl;
         return 0;
     }
