@@ -394,6 +394,13 @@ void changeGraphDialog::setSettings(struct Settings& settings){
     ui->spinbox_y_min->setValue(settings.ymin);
     ui->spinbox_y_max->setValue(settings.ymax);
     ui->spinbox_range_adjustment->setValue(settings.automatic_value);
+
+	m_settings_old.ymax = settings.ymax;
+	m_settings_old.ymin = settings.ymin;
+	m_settings_old.automatic_value = settings.automatic_value;
+	m_settings_old.ifautomatic_range = settings.ifautomatic_range;
+	m_settings_old.ifrelative_ranging = settings.ifrelative_ranging;
+	m_settings_old.automatic_value = settings.automatic_value;
     for(int i=0; i< settings.signal_settings.length(); i++){
         addElement(&settings.signal_settings[i]);
     }
