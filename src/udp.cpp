@@ -225,6 +225,7 @@ void UDP::timerTimeout(){
 
     m_export = new ExportData(m_filename,m_project_name,m_udp_buffer,index_before, m_udp_global_index, m_udp_buffer_size,m_signals,this);
     connect(m_export, &ExportData::resultReady, this, &UDP::exportFinished);
+	connect(m_export, &ExportData::resultReady, m_triggerwidget, &TriggerWidget::enableStartTriggerButton);
     connect(m_export, &ExportData::showInfoMessage, m_parent,&Plots::showInfoMessageBox, Qt::ConnectionType::QueuedConnection);
     m_export->run();
 }
