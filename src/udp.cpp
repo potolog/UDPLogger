@@ -201,7 +201,7 @@ void UDP::timerTimeout(){
         if(std::abs(time_before) <= 0.000001){
             emit disableTrigger();
             emit showInfoMessageBox(QObject::tr("Trigger times invalid"), QObject::tr("Please set 'Time before trigger' or 'Time after trigger' unequal to zero"));
-            m_trigger_in_progress = false;
+			exportFinished();
             return;
         }
         index_before = m_trigger_index - static_cast<int>(time_before)/m_time_difference;
@@ -219,7 +219,8 @@ void UDP::timerTimeout(){
                                 QString::number(m_udp_global_index-index_before)+") "+tr("is higher "
                                 "than the UDP buffer size (")+QString::number(m_udp_buffer_size)+tr("). So the data repeats. Please set "
                                 "the trigger times lower or set the UDP buffersize to a higher value"));
-        m_trigger_in_progress = false;
+
+		exportFinished();
         return;
     }
 
