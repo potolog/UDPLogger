@@ -110,6 +110,7 @@ void TriggerWidget::on_spinbox_t_after_trigger_valueChanged(double arg1)
 
 void TriggerWidget::triggered(){
 	ui->pb_start_trigger->setEnabled(true);
+	ui->checkbox_enable_trigger->setEnabled(true);
     if(!m_automatic_restart){
         ui->checkbox_enable_trigger->setChecked(false);
         return;
