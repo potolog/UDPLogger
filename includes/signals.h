@@ -63,7 +63,7 @@ private:
 public slots:
     void importSignals();
     void exportUDPFunction();
-    void changeSignalSettings(QString relative_header_path, QString additional_includes);
+	void changeSignalSettings(QString sourcePath, QString relative_header_path, QString additional_includes);
     bool signalExist(struct Signal signal_to_match) const;
 
 signals:

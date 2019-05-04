@@ -222,13 +222,13 @@ void Plots::settings(){
     m_settings_dialog->exec();
 }
 
-void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString relative_header_path, QString additional_includes){
+void Plots::settingsAccepted(QString project_name, QHostAddress hostname, int udp_buffersize, int plot_buffersize, int port, int refresh_rate, int use_data_count, QString export_path, QString sourcePath, QString relative_header_path, QString additional_includes){
     m_project_name = project_name;
     m_hostaddress = hostname;
     m_port = port;
     m_refresh_rate = refresh_rate;
     m_use_data_count = use_data_count;
-    emit changeSignalSettings(relative_header_path, additional_includes);
+	emit changeSignalSettings(sourcePath, relative_header_path, additional_includes);
     emit plotBufferSizeChanged(plot_buffersize);
     emit initUDP(hostname,static_cast<quint16>(port),udp_buffersize,refresh_rate, use_data_count, export_path,project_name);
 }

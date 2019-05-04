@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>385</width>
+    <width>876</width>
     <height>649</height>
    </rect>
   </property>
@@ -208,6 +208,27 @@
       <string>ExportPackageFunction</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Path for source file</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="leExportSourceFilePath"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbBrowseSourcePath">
+          <property name="text">
+           <string>Browse File</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>

@@ -518,7 +518,8 @@ void Signals::getInputArguments(QVector<struct input_arguments>& arguments){
     }
 }
 
-void Signals::changeSignalSettings(QString relative_header_path, QString additional_includes){
-    m_header_path = relative_header_path;
+void Signals::changeSignalSettings(QString sourcePath, QString relative_header_path, QString additional_includes){
+	m_c_path = sourcePath;
+	m_header_path = relative_header_path;
     m_additional_includes = additional_includes;
 }

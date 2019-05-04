@@ -44,6 +44,8 @@ SettingsDialog::SettingsDialog(Plots *parent) :
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &SettingsDialog::accepted);
     connect(this, &SettingsDialog::settingsAccepted, parent, &Plots::settingsAccepted);
     connect(ui->combo_hostname, qOverload<int>(&QComboBox::currentIndexChanged), this, &SettingsDialog::comboHostnameIndexChanged);
+	connect(ui->leExportSourceFilePath, &QLineEdit::textChanged, this, &SettingsDialog::leSourcePathTextChanged);
+	connect(ui->txt_relative_header_path, &QLineEdit::textChanged, this, &SettingsDialog::leHeaderPathTextChanged);
 
     initSettings();
     accepted(); // initially setting settings
@@ -88,6 +90,7 @@ void SettingsDialog::accepted(){
     int refresh_rate;
     bool export_data;
     int use_data_count;
+	QString sourcePath;
     QString relative_header_path;
     QString additional_includes;
 
@@ -102,8 +105,9 @@ void SettingsDialog::accepted(){
     QString project_name = ui->txt_project_name->text();
     QString export_filename = ui->txt_export_path->text();
     additional_includes = ui->txt_additional_includes->text();
+	sourcePath = ui->leExportSourceFilePath->text();
 
-    emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, port,refresh_rate, use_data_count, export_filename,relative_header_path, additional_includes);
+	emit settingsAccepted(project_name, hostname, udp_buffersize, plot_buffersize, port,refresh_rate, use_data_count, export_filename, sourcePath, relative_header_path, additional_includes);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -118,6 +122,12 @@ void SettingsDialog::on_btn_browse_export_file_clicked()
     ui->txt_export_path->setText(path);
 }
 
+void SettingsDialog::on_pbBrowseSourcePath_clicked() {
+	QString path = QFileDialog::getExistingDirectory(this,
+			tr("Set export file path"), "/home");
+	ui->leExportSourceFilePath->setText(path);
+}
+
 void SettingsDialog::createJSONObject(QJsonObject& object){
     QJsonObject network_settings;
     network_settings["HostAddress"] = QHostAddress(ui->txt_hostaddress->text()).toString();
@@ -128,6 +138,7 @@ void SettingsDialog::createJSONObject(QJsonObject& object){
     object["ExportDataFile"] =ui->txt_export_path->text();
     object["RefreshRate"] = static_cast<int>(ui->spinbox_refresh_rate->value());
     object["SkipElement"] = static_cast<int>(ui->spinbox_use_element_count->value());
+	object["ExportSourceFile"] = ui->leExportSourceFilePath->text();
     object["relative_header_path"] = ui->txt_relative_header_path->text();
     object["additionalIncludes"] = ui->txt_additional_includes->text();
 }
@@ -137,6 +148,7 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
     ui->spinbox_plot_buffer->setValue(static_cast<double>(object["PlotPufferSize"].toInt()));
     ui->spinbox_refresh_rate->setValue(static_cast<double>(object["RefreshRate"].toInt()));
     ui->spinbox_use_element_count->setValue(static_cast<double>(object["SkipElement"].toInt()));
+	ui->leExportSourceFilePath->setText(object["ExportSourceFile"].toString());
     ui->txt_relative_header_path->setText(object["relative_header_path"].toString());
 
     QJsonObject network_settings = object["NetworkSettings"].toObject();
@@ -152,7 +164,49 @@ void SettingsDialog::readJSONObject(QJsonObject& object, QString project_name){
 
 }
 
-void SettingsDialog::on_txt_export_path_textChanged(const QString &arg1)
-{
+void SettingsDialog::on_txt_export_path_textChanged(const QString &text) {
+	Q_UNUSED(text)
+	checkSettingsOK();
+}
 
+void SettingsDialog::leSourcePathTextChanged(const QString &text) {
+	Q_UNUSED(text)
+	checkSettingsOK();
+}
+
+void SettingsDialog::leHeaderPathTextChanged(const QString& text) {
+	Q_UNUSED(text)
+	checkSettingsOK();
+}
+
+void SettingsDialog::checkSettingsOK() {
+
+	if (!QDir(ui->txt_export_path->text()).exists()) {
+		ui->buttonBox->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(false);
+		ui->buttonBox->setToolTip("Data export path is not valid");
+		ui->txt_export_path->setStyleSheet("QLineEdit{background:red;}");
+		return;
+	} else {
+		ui->txt_export_path->setStyleSheet(QString());
+	}
+
+	if (!QDir(ui->leExportSourceFilePath->text()).exists()) {
+		ui->buttonBox->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(false);
+		ui->buttonBox->setToolTip("ExportSourceFile path is not valid");
+		ui->leExportSourceFilePath->setStyleSheet("QLineEdit{background:red;}");
+		return;
+	} else {
+		ui->leExportSourceFilePath->setStyleSheet(QString());
+	}
+
+	if (!QDir(ui->leExportSourceFilePath->text()+"/"+ui->txt_relative_header_path->text()).exists()) {
+		ui->buttonBox->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(false);
+		ui->buttonBox->setToolTip("Relative header path does not exist");
+		ui->txt_relative_header_path->setStyleSheet("QLineEdit{background:red;}");
+		return;
+	} else {
+		ui->txt_relative_header_path->setStyleSheet(QString());
+	}
+	ui->buttonBox->setToolTip("Acccept settings");
+	ui->buttonBox->button(QDialogButtonBox::StandardButton::Ok)->setEnabled(true);
 }
