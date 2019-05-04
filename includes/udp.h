@@ -70,6 +70,7 @@ signals:
     void showInfoMessageBox(QString title, QString text);
     void disableTrigger();
 	void newTriggerValue(double value);
+	void triggerStarted();
 
 private:
     int m_actual_index;

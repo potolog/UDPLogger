@@ -37,7 +37,8 @@ public slots:
     void updateSignals();
     void triggered();
 	void newTriggerValue(double value);
-	void enableStartTriggerButton();
+	void triggerFinished();
+	void triggerStarted();
 
 private slots:
     void on_spinbox_trigger_level_valueChanged(double arg1);

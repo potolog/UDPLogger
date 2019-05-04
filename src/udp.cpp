@@ -53,6 +53,7 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
     connect(this, &UDP::disableTrigger, trigger, &TriggerWidget::disableTrigger, Qt::ConnectionType::BlockingQueuedConnection);
 	connect(this, &UDP::newTriggerValue, trigger, &TriggerWidget::newTriggerValue, Qt::ConnectionType::QueuedConnection);
 	connect(trigger, &TriggerWidget::startTrigger, this, &UDP::startTrigger, Qt::ConnectionType::BlockingQueuedConnection);
+	connect(this, &UDP::triggerStarted, trigger, &TriggerWidget::triggerStarted, Qt::ConnectionType::QueuedConnection);
 	connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
 
 
@@ -226,7 +227,7 @@ void UDP::timerTimeout(){
 
     m_export = new ExportData(m_filename,m_project_name,m_udp_buffer,index_before, m_udp_global_index, m_udp_buffer_size,m_signals,this);
     connect(m_export, &ExportData::resultReady, this, &UDP::exportFinished);
-	connect(m_export, &ExportData::resultReady, m_triggerwidget, &TriggerWidget::enableStartTriggerButton);
+	connect(m_export, &ExportData::resultReady, m_triggerwidget, &TriggerWidget::triggerFinished);
     connect(m_export, &ExportData::showInfoMessage, m_parent,&Plots::showInfoMessageBox, Qt::ConnectionType::QueuedConnection);
     m_export->run();
 }
@@ -237,6 +238,7 @@ void UDP::exportFinished(){
 }
 
 void UDP::startTrigger(){
+	emit triggerStarted();
 	QTimer::singleShot(m_triggerwidget->getTimeAfterTrigger()*1000,this,&UDP::timerTimeout);
 	m_trigger_in_progress = true;
 	m_previous_value = m_data_buffers->getValue(m_udp_buffer[m_udp_index].puffer, UDP_CONSTANTS::max_data,m_triggerwidget->getTriggerSignal());

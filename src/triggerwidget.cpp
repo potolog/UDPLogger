@@ -128,12 +128,17 @@ void TriggerWidget::newTriggerValue(double value){
 	ui->lbl_value->setText(QString::number(value));
 }
 
-void TriggerWidget::enableStartTriggerButton() {
+void TriggerWidget::triggerFinished() {
 	ui->pb_start_trigger->setEnabled(true);
+	ui->checkbox_enable_trigger->setEnabled(true);
 }
 
 void TriggerWidget::on_pb_start_trigger_clicked()
 {
-	ui->pb_start_trigger->setEnabled(false);
 	emit startTrigger();
+}
+
+void TriggerWidget::triggerStarted() {
+	ui->pb_start_trigger->setEnabled(false);
+	ui->checkbox_enable_trigger->setEnabled(false);
 }
