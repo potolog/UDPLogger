@@ -80,7 +80,7 @@ private:
     unsigned long m_index_new_data; // used with m_refresh_rate
     int m_use_data_count;
 
-	const QString m_program_version = "2.4.6";
+	const QString m_program_version = "2.4.7";
     QString m_project_name;
     bool m_ifudpLogging;
     SettingsDialog* m_settings_dialog;
