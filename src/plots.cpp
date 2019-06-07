@@ -83,16 +83,29 @@ void Plots::deletePlot(Plot* plot_address){
 
 }
 
-void Plots::exportSettings(){
-    QString select = tr("UDP Logger Config Files (*.udpLoggerSettings)");
-    QFileDialog filedialog;
-    filedialog.setDefaultSuffix(".udpLoggerSettings");
-    QString fileName = filedialog.getSaveFileName(this,
-			tr("Export Settings"), m_export_filename,
-            select,&select);
+void Plots::saveSettings() {
+	if(m_export_filename.compare("") == 0)
+		return;
 
-    if(fileName.compare("") == 0)
-        return;
+	exportSettings(m_export_filename);
+}
+
+void Plots::saveSettingsAs() {
+	QString select = tr("UDP Logger Config Files (*.udpLoggerSettings)");
+	QFileDialog filedialog;
+	filedialog.setDefaultSuffix(".udpLoggerSettings");
+	QString fileName = filedialog.getSaveFileName(this,
+			tr("Export Settings"), m_export_filename,
+			select,&select);
+
+	if(fileName.compare("") == 0)
+		return;
+
+	exportSettings(fileName);
+}
+
+void Plots::exportSettings(QString fileName){
+
 
 	m_export_filename = fileName;
     QJsonObject object;

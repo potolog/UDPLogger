@@ -55,10 +55,16 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui->scrollArea->setWidget(m_plots);
     QMenu* menu = ui->menuBar->addMenu(tr("&File"));
 
-    QAction *export_settings = new QAction(tr("&export Settings"), this);
-    export_settings->setStatusTip(tr("Wizard to create a new Plot"));
-    connect(export_settings, &QAction::triggered, m_plots, &Plots::exportSettings);
-    menu->addAction(export_settings);
+	QAction *save_settings_as = new QAction(tr("&save Settings as ..."), this);
+	save_settings_as->setStatusTip(tr("Wizard to create a new Plot"));
+	connect(save_settings_as, &QAction::triggered, m_plots, &Plots::saveSettingsAs);
+	menu->addAction(save_settings_as);
+
+	QAction *save_settings = new QAction(tr("&save Settings"), this);
+	save_settings->setStatusTip(tr("Wizard to create a new Plot"));
+	connect(save_settings, &QAction::triggered, m_plots, &Plots::saveSettings);
+	menu->addAction(save_settings);
+
 
     QAction *import_settings = new QAction(tr("&import Settings"), this);
     import_settings->setStatusTip(tr("Wizard to create a new Plot"));

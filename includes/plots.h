@@ -50,7 +50,9 @@ public:
     QWidget* getParent(){return m_parent;}
 public slots:
     void deletePlot(Plot *plot_address);
-    void exportSettings();
+	void saveSettings();
+	void saveSettingsAs();
+	void exportSettings(QString fileName);
     void importSettings();
     void settings();
     void startUDP();
