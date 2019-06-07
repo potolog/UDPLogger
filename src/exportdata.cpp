@@ -49,7 +49,7 @@ void ExportData::run(){
             return;
         }
         QString date = QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss");
-        std::string output_file_name = (m_path+"/"+m_project_name+"_"+date+".hdf5").toStdString();
+		std::string output_file_name = (m_path+"/"+m_project_name+"_"+date+".cdf").toStdString();
 
         NcFile::FileFormat format = NcFile::nc4;
         NcFile datafile(output_file_name,NcFile::replace,format);
