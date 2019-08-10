@@ -234,7 +234,10 @@ void UDP::timerTimeout(){
 
 void UDP::exportFinished(){
 	emit triggerFinished();
-    m_export->deleteLater();
+	if (m_export) {
+		m_export->deleteLater();
+		m_export = nullptr;
+	}
     m_trigger_in_progress = false;
 }
 
