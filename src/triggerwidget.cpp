@@ -21,7 +21,7 @@ TriggerWidget::TriggerWidget(Signals *signal, QWidget *parent) :
     m_trigger_level = 0;
     m_trigger_enabled = false;
     ui->checkbox_enable_trigger->setEnabled(false);
-
+	ui->lbl_status->setStyleSheet("QWidget { background-color: green }");
 }
 
 TriggerWidget::~TriggerWidget()
@@ -130,6 +130,7 @@ void TriggerWidget::newTriggerValue(double value){
 }
 
 void TriggerWidget::triggerFinished() {
+	ui->lbl_status->setStyleSheet("QWidget { background-color: green }");
 	ui->pb_start_trigger->setEnabled(true);
 	ui->checkbox_enable_trigger->setEnabled(true);
 }
@@ -140,6 +141,7 @@ void TriggerWidget::on_pb_start_trigger_clicked()
 }
 
 void TriggerWidget::triggerStarted() {
+	ui->lbl_status->setStyleSheet("QWidget { background-color: yellow }");
 	ui->pb_start_trigger->setEnabled(false);
 	ui->checkbox_enable_trigger->setEnabled(false);
 }
