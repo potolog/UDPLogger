@@ -60,14 +60,14 @@ signals:
 	void startTrigger();
 private:
     Ui::TriggerWidget *ui;
-    Signals* m_signals;
-    double m_trigger_level;
-    TriggerType m_trigger_type;
-    int m_signal_index;
-    bool m_trigger_enabled;
-    bool m_automatic_restart;
-    double m_t_before_trigger;
-    double m_t_after_trigger;
+	Signals* m_signals{nullptr};
+	double m_trigger_level{0};
+	TriggerType m_trigger_type{TriggerType::RISING_EDGE};
+	int m_signal_index{0};
+	bool m_trigger_enabled{false};
+	bool m_automatic_restart{false};
+	double m_t_before_trigger{0};
+	double m_t_after_trigger{0};
 };
 
 #endif // TRIGGERWIDGET_H

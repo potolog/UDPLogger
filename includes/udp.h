@@ -76,30 +76,30 @@ private:
     int m_actual_index;
     int64_t m_udp_global_index;
 
-    QUdpSocket *m_socket;
+	QUdpSocket *m_socket{nullptr};
     int m_use_data_count;
     int m_udp_buffer_size;
     bool m_if_file_ready;
 
-    QMutex* m_mutex;
-    QThread* m_writing_data_thread;
+	QMutex* m_mutex{nullptr};
+	QThread* m_writing_data_thread{nullptr};
 
     unsigned long m_index_read; // index which data was read
-    Plots* m_parent;
+	Plots* m_parent{nullptr};
 
-    bool m_ifread_data;
+	bool m_ifread_data{false};
     int m_data_buffer_size;
 
     bool m_data_changed;
     int m_refresh_rate;
 
-    PlotBuffers *m_data_buffers;
-    Signals* m_signals;
+	PlotBuffers *m_data_buffers{nullptr};
+	Signals* m_signals{nullptr};
     int m_buffer_smaller_than_message;
-    TriggerWidget *m_triggerwidget;
+	TriggerWidget *m_triggerwidget{nullptr};
     double m_previous_value;
     int64_t m_trigger_index;
-    bool m_trigger_in_progress;
+	bool m_trigger_in_progress{false};
 
     QString m_filename;
     QString m_project_name;
@@ -110,12 +110,12 @@ private:
 
     int64_t m_time_state;
 
-    QTimer* m_timer;
+	QTimer* m_timer{nullptr};
 
-    ExportData* m_export;
+	ExportData* m_export{nullptr};
     int64_t m_time_difference;
 
-	double m_actual_value;
+	double m_actual_value{0};
 
 
 };

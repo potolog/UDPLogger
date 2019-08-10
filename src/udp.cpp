@@ -41,12 +41,7 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 {
     m_socket = new QUdpSocket(this);
     connect(m_socket, &QUdpSocket::readyRead, this, &UDP::readData);
-    m_ifread_data = 0;
-
-    m_trigger_in_progress = false;
-
     m_timer = new QTimer(this);
-	m_actual_value = 0;
 
 
     connect(this, &UDP::triggerFinished, trigger, &TriggerWidget::triggered, Qt::ConnectionType::QueuedConnection);
@@ -55,10 +50,6 @@ UDP::UDP(Plots *parent, QMutex *mutex, PlotBuffers *data_buffers, Signals *signa
 	connect(trigger, &TriggerWidget::startTrigger, this, &UDP::startTrigger, Qt::ConnectionType::BlockingQueuedConnection);
 	connect(this, &UDP::triggerStarted, trigger, &TriggerWidget::triggerStarted, Qt::ConnectionType::QueuedConnection);
 	connect(m_timer, &QTimer::timeout, this, &UDP::refreshPlot);
-
-
-
-
 }
 bool UDP::init(){
     return init(QHostAddress::AnyIPv4, 60000,200,10,1, "", "");

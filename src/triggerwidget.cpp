@@ -13,13 +13,6 @@ TriggerWidget::TriggerWidget(Signals *signal, QWidget *parent) :
     }
 
     ui->cb_triggertype->setCurrentIndex(0);
-    m_signal_index = 0;
-    m_t_after_trigger =0;
-    m_t_before_trigger = 0;
-    m_trigger_type = TriggerType::RISING_EDGE;
-    m_automatic_restart = false;
-    m_trigger_level = 0;
-    m_trigger_enabled = false;
     ui->checkbox_enable_trigger->setEnabled(false);
 	ui->lbl_status->setStyleSheet("QWidget { background-color: green }");
 }
