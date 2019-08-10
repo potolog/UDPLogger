@@ -24,6 +24,7 @@ Supported signal types:
 - double
 
 ![alt text](https://github.com/Murmele/UDPLogger/blob/master/res/images/MainView.png)
+![alt text](https://github.com/Murmele/UDPLogger/blob/master/res/images/CurveSettings.png)
 
 TODO:
 - qgrip , resizing plots
@@ -32,7 +33,7 @@ TODO:
 Dependencies:
 
 - xlnt: https://github.com/tfussell/xlnt
-- netcdf_c++4: https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
+- netcdf_c++14: https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
 	- Download source. Set Debug=true in configure
 	- ./configure
 	- make
